@@ -26,23 +26,23 @@ public class DatabaseInitializer {
 					trailerPath VARCHAR(200)
 				);
 				
-				CREATE TABLE Genre (
+				CREATE TABLE IF NOT EXISTS Genre (
 					id SERIAL PRIMARY KEY,
 					name VARCHAR(255)	
 				);
 				
-				CREATE TABLE HasGenre (
+				CREATE TABLE IF NOT EXISTS HasGenre (
 					movie_id INTEGER REFERENCES Movie(id),
 					genre_id INTEGER REFERENCES Genre(id),
 					PRIMARY KEY (movie_id, genre_id)
 				);
 				
-				CREATE TABLE Actor (
+				CREATE TABLE IF NOT EXISTS Actor (
 					id SERIAL PRIMARY KEY,
 					name VARCHAR(255)
 				);
 				
-				CREATE TABLE HasActor (
+				CREATE TABLE IF NOT EXISTS HasActor (
 					movie_id INTEGER REFERENCES Movie(id),
 					actor_id INTEGER REFERENCES Actor(id),
 					role VARCHAR(255),
@@ -55,7 +55,7 @@ public class DatabaseInitializer {
 					date DATE
 				);
 				
-				CREATE TABLE InLobby (
+				CREATE TABLE IF NOT EXISTS InLobby (
 					lobby_id INTEGER REFERENCES Lobby(id),
 					user_id INTEGER REFERENCES "User"(id),
 					PRIMARY KEY (lobby_id, user_id)
