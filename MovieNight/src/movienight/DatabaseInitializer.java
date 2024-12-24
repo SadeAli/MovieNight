@@ -26,10 +26,39 @@ public class DatabaseInitializer {
 					trailerPath VARCHAR(200)
 				);
 				
+				CREATE TABLE Genre (
+					id SERIAL PRIMARY KEY,
+					name VARCHAR(255)	
+				);
+				
+				CREATE TABLE HasGenre (
+					movie_id INTEGER REFERENCES Movie(id),
+					genre_id INTEGER REFERENCES Genre(id),
+					PRIMARY KEY (movie_id, genre_id)
+				);
+				
+				CREATE TABLE Actor (
+					id SERIAL PRIMARY KEY,
+					name VARCHAR(255)
+				);
+				
+				CREATE TABLE HasActor (
+					movie_id INTEGER REFERENCES Movie(id),
+					actor_id INTEGER REFERENCES Actor(id),
+					role VARCHAR(255),
+					PRIMARY KEY (movie_id, actor_id)
+				);
+				
 				CREATE TABLE IF NOT EXISTS Lobby(
 					id SERIAL PRIMARY KEY,
 					owner_id INTEGER REFERENCES "User"(id),
 					date DATE
+				);
+				
+				CREATE TABLE InLobby (
+					lobby_id INTEGER REFERENCES Lobby(id),
+					user_id INTEGER REFERENCES "User"(id),
+					PRIMARY KEY (lobby_id, user_id)
 				);
 				
 				CREATE TABLE IF NOT EXISTS Suggestion(
