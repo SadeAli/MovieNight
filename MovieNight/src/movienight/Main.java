@@ -12,12 +12,8 @@ public class Main {
             System.out.println("Successfully connected to the MovieNight_DB!");
             
             // Initialize the database (create tables)
-            // DatabaseInitializer.initialize(connection);
-            
-            Statement stmt = connection.createStatement();
-            while (true) {
-            	stmt.execute("Select * from movie");
-            }
+            DatabaseInitializer.initialize(connection);
+
         } catch (SQLException e) {
             System.out.println("Connection error: " + e.getMessage());
         }
