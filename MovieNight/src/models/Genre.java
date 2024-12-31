@@ -1,10 +1,10 @@
-package movienight;
+package models;
 
-public class Actor {
+public class Genre {
 	int id;
 	String name;
 	
-	public Actor(int id, String name)
+	public Genre(int id, String name)
 	{
 		this.id = id;
 		this.name = name;
@@ -25,5 +25,5 @@ public class Actor {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
 }
+

@@ -1,15 +1,14 @@
-package movienight;
+package models;
 
-public class Suggestion {
-
+public class Vote {
 	int lobbyId;
-	int suggestedBy;
+	int userId;
 	int movieId;
 	
-	public Suggestion(int lobbyId, int suggestedBy, int movieId)
+	public Vote(int lobbyId, int userId, int movieId)
 	{
 		this.lobbyId = lobbyId;
-		this.suggestedBy = suggestedBy;
+		this.userId = userId;
 		this.movieId = movieId;
 	}
 
@@ -21,12 +20,12 @@ public class Suggestion {
 		this.lobbyId = lobbyId;
 	}
 
-	public int getSuggestedBy() {
-		return suggestedBy;
+	public int getUserId() {
+		return userId;
 	}
 
-	public void setSuggestedBy(int suggestedBy) {
-		this.suggestedBy = suggestedBy;
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 
 	public int getMovieId() {

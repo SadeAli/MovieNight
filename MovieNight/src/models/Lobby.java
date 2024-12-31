@@ -1,4 +1,4 @@
-package movienight;
+package models;
 
 import java.time.LocalDate;
 

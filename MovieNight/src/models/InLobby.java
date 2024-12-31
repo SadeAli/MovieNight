@@ -1,15 +1,14 @@
-package movienight;
+package models;
 
-public class Vote {
+public class InLobby {
+
 	int lobbyId;
 	int userId;
-	int movieId;
 	
-	public Vote(int lobbyId, int userId, int movieId)
+	public InLobby(int lobbyId, int userId)
 	{
 		this.lobbyId = lobbyId;
 		this.userId = userId;
-		this.movieId = movieId;
 	}
 
 	public int getLobbyId() {
@@ -26,14 +25,6 @@ public class Vote {
 
 	public void setUserId(int userId) {
 		this.userId = userId;
-	}
-
-	public int getMovieId() {
-		return movieId;
-	}
-
-	public void setMovieId(int movieId) {
-		this.movieId = movieId;
 	}
 	
 	
