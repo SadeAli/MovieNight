@@ -80,6 +80,17 @@ public abstract class AbstractDAO<T> {
             return false;
         }
     }
+    
+    // Delete with any condition 
+    public boolean delete(String deleteQuery, Object... parameters) {
+        try (PreparedStatement stmt = connection.prepareStatement(deleteQuery)) {
+            setParameters(stmt, parameters);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Destroy error: " + e.getMessage());
+            return false;
+        }
+    }
 
     // Helper to set parameters for PreparedStatement
     private void setParameters(PreparedStatement stmt, Object... parameters) throws SQLException {
