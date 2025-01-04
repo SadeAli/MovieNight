@@ -1,13 +1,16 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package movienightgui;
 
+import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -15,12 +18,13 @@ import javax.swing.event.DocumentListener;
  *
  * @author deneg
  */
-public class HomeGUI extends javax.swing.JFrame {
+public class HomePanel extends javax.swing.JPanel {
     
-    private String loggedInUser = "";
+    private String loggedUser;
     private ArrayList<String> users = new ArrayList<>();
     private DefaultListModel<String> usersModel = new DefaultListModel<>();
     private HashMap<String, Boolean> usersAndInvitations = new HashMap<>();
+    private IDatabase db;
     
     private String selectedUser = "";
     private ArrayList<String> invitedUsers = new ArrayList<>();
@@ -30,49 +34,44 @@ public class HomeGUI extends javax.swing.JFrame {
     private ArrayList<String> invitations = new ArrayList<>();
     private DefaultListModel<String> invitationsModel = new DefaultListModel<>();
     private String acceptedInvitation;
+    private int numOfInvited = 0;
     
-    /**
-     * Creates new form HomeGUI
-     */
-    public HomeGUI() {
-        initComponents();
-        initSearch();
-
-        testInit();
-        
-    }
+    private Boolean isCreatingNewLobby = false;
     
-    public void testInit() {
-        loginAs("degD");
-        users.add(loggedInUser);
-        users.add("SadeAli");
-        users.add("EsgiJ");
-        usersModel.addElement(loggedInUser);
-        usersModel.addElement("SadeAli");
-        usersModel.addElement("EsgiJ");
-        usersAndInvitations.put(loggedInUser, false);
-        usersAndInvitations.put("SadeAli", false);
-        usersAndInvitations.put("EsgiJ", false);
-        for (int i=0; i < 20; i++) {
-            users.add(String.valueOf(i));
-            usersModel.addElement(String.valueOf(i));
-            usersAndInvitations.put(String.valueOf(i), false);
-        }
-        usersList.setModel(usersModel);
-        
-        for (int i=0; i < 5; i++) {
-            invitations.add(String.valueOf(i));
-            invitationsModel.addElement(String.valueOf(i));
-        }
-        invitationsList.setModel(invitationsModel);
-    }
+    private SharedUserModel sharedUserModel;
+    private JFrame parentFrame;
     
     public void loginAs(String username) {
         loggedUserLabel.setText(username);
-        loggedInUser = username;
-        selectedUser = loggedInUser;
-        selectedUserLabel.setText(loggedInUser);
+        this.loggedUser = username;
+        selectedUser = loggedUser;
+        selectedUserLabel.setText(loggedUser);
         userInviteCancelButton.setEnabled(false);
+    }
+    
+    /**
+     * Creates new form HomePanel
+     *
+     * @param loggedUser
+     * @param db
+     */
+    public HomePanel(IDatabase db, SharedUserModel sharedUserModel, JFrame parentFrame) {
+        initComponents();
+        this.db = db;
+        this.sharedUserModel = sharedUserModel;
+        this.parentFrame = parentFrame;
+    }
+    
+    public void init() {
+        initSearch();
+
+        loginAs(sharedUserModel.getUsername());
+        loadUsers();
+        loadInvitations();
+
+        for (String user : users) {
+            usersAndInvitations.put(user, false);
+        }
     }
     
     private void initSearch() {
@@ -112,15 +111,39 @@ public class HomeGUI extends javax.swing.JFrame {
     }
     
     private void loadUsers() {
-        // Load users from DB
+        users = db.getUsers();
         usersModel.removeAllElements();
         usersModel.addAll(users); 
+        usersList.setModel(usersModel);
     }
     
     private void loadInvitations() {
-        // Load invitations from DB
+       invitations = db.getInvitiationsForUser(loggedUser);
        invitationsModel.removeAllElements();
        invitationsModel.addAll(invitations);
+       invitationsList.setModel(invitationsModel);
+    }
+    
+    private void displayInvitations() {
+        loadInvitations();
+        invitationAcceptButton.setText("Accept");
+    }
+    
+    private void displayLobbyCreate() {
+        isCreatingNewLobby = true;
+        invitationsModel.removeAllElements();
+        invitationsModel.addElement(loggedUser);      
+        invitationAcceptButton.setText("Create Lobby");
+    }
+    
+    private void showLobby() {
+        CardLayout cl = (CardLayout) parentFrame.getContentPane().getLayout();
+        cl.show(parentFrame.getContentPane(), "lobby");
+        for (Component component : parentFrame.getContentPane().getComponents()) {
+            if (component instanceof LobbyPanel lobbyPanel) {
+                lobbyPanel.init();
+            }
+        }
     }
 
     /**
@@ -132,7 +155,6 @@ public class HomeGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panel = new javax.swing.JPanel();
         invitationsPanel = new javax.swing.JPanel();
         invitationsScroll = new javax.swing.JScrollPane();
         invitationsList = new javax.swing.JList<>();
@@ -146,8 +168,6 @@ public class HomeGUI extends javax.swing.JFrame {
         loggedUserPanel = new javax.swing.JPanel();
         loggedUserLabel = new javax.swing.JLabel();
         refreshButton = new javax.swing.JButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         invitationsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Invitations", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI Black", 0, 12))); // NOI18N
 
@@ -280,71 +300,106 @@ public class HomeGUI extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
-        panel.setLayout(panelLayout);
-        panelLayout.setHorizontalGroup(
-            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelLayout.createSequentialGroup()
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
                 .addComponent(invitationsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(usersPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(panelLayout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addComponent(loggedUserPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(refreshButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        panelLayout.setVerticalGroup(
-            panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelLayout.createSequentialGroup()
-                .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(usersPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(invitationsPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
-                .addGroup(panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(loggedUserPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(refreshButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(panel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void userInviteCancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userInviteCancelButtonActionPerformed
-        // TODO add your handling code here:  
-        usersAndInvitations.put(selectedUser, !usersAndInvitations.get(selectedUser));
-        if (!usersAndInvitations.get(selectedUser)) {
-            userInviteCancelButton.setText("Invite");
-        } else {
-            userInviteCancelButton.setText("Cancel");
+    private void invitationsListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_invitationsListMouseClicked
+        // TODO add your handling code here:
+        if (invitationsList.getSelectedValue() != null && acceptedInvitation == null) {
+            invitationAcceptButton.setEnabled(true);
         }
-    }//GEN-LAST:event_userInviteCancelButtonActionPerformed
+    }//GEN-LAST:event_invitationsListMouseClicked
 
     private void invitationAcceptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_invitationAcceptButtonActionPerformed
         // TODO add your handling code here:
         if (invitationsList.getSelectedValue() != null) {
             acceptedInvitation = invitationsList.getSelectedValue();
             invitationAcceptButton.setEnabled(false);
+            
+            if (numOfInvited == 0) {
+                System.out.println("Accepted Invitation of " + acceptedInvitation);
+                sharedUserModel.setLobby(acceptedInvitation);
+            } else {
+                System.out.println("Creating a new lobby...");
+                sharedUserModel.setLobby(loggedUser);
+            }
+            db.addUserToLobby(sharedUserModel.getLobby(), loggedUser);
+            showLobby();
         }
     }//GEN-LAST:event_invitationAcceptButtonActionPerformed
 
-    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
+    private void usersListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_usersListMouseClicked
         // TODO add your handling code here:
-        refreshSearch();
-        loadUsers();
-        loadInvitations();
-    }//GEN-LAST:event_refreshButtonActionPerformed
+        if (usersList.getSelectedValue() != null) {
+            selectedUser = usersList.getSelectedValue();
+        }
+        selectedUserLabel.setText(selectedUser);
+
+        if (selectedUser.equals(loggedUser)) {
+            userInviteCancelButton.setEnabled(false);
+        } else {
+            userInviteCancelButton.setEnabled(true);
+        }
+
+        if (!usersAndInvitations.get(selectedUser)) {
+            userInviteCancelButton.setText("Invite");
+        } else {
+            userInviteCancelButton.setText("Cancel");
+        }
+        System.out.println(selectedUser);
+    }//GEN-LAST:event_usersListMouseClicked
+
+    private void userInviteCancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userInviteCancelButtonActionPerformed
+        // TODO add your handling code here:
+        usersAndInvitations.put(selectedUser, !usersAndInvitations.get(selectedUser));
+        
+        if (!usersAndInvitations.get(selectedUser)) {
+            numOfInvited -= 1;
+            userInviteCancelButton.setText("Invite");
+            db.removeInvitationFromUser(selectedUser, loggedUser);
+            
+            // If no other user is invited, show invitations again.
+            if (numOfInvited == 0) {
+                displayInvitations();
+            }
+        } else {
+            numOfInvited += 1;
+            userInviteCancelButton.setText("Cancel");
+            db.sendInvitationToUser(loggedUser, selectedUser);
+            
+            // If invited any user, stop displaying other invitations and only
+            // display created lobby invitation.            
+            if (numOfInvited >= 1) {
+                displayLobbyCreate();
+            }
+        }
+        System.out.println(selectedUser + db.getInvitiationsForUser(selectedUser));
+    }//GEN-LAST:event_userInviteCancelButtonActionPerformed
 
     private void searchUserFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchUserFieldFocusGained
         // TODO add your handling code here:
@@ -365,67 +420,18 @@ public class HomeGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_searchUserFieldFocusLost
 
-    private void usersListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_usersListMouseClicked
+    private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshButtonActionPerformed
         // TODO add your handling code here:
-        if (usersList.getSelectedValue() != null) {
-            selectedUser = usersList.getSelectedValue();
-        }
-        selectedUserLabel.setText(selectedUser);
-
-        if (selectedUser.equals(loggedInUser)) {
-            userInviteCancelButton.setEnabled(false);
+        refreshSearch();
+        loadUsers();
+        loadInvitations();
+        if (numOfInvited >= 1) {
+            displayLobbyCreate();
         } else {
-            userInviteCancelButton.setEnabled(true);
+            displayInvitations();
         }
+    }//GEN-LAST:event_refreshButtonActionPerformed
 
-        if (!usersAndInvitations.get(selectedUser)) {
-            userInviteCancelButton.setText("Invite");
-        } else {
-            userInviteCancelButton.setText("Cancel");
-        }
-    }//GEN-LAST:event_usersListMouseClicked
-
-    private void invitationsListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_invitationsListMouseClicked
-        // TODO add your handling code here:
-        if (invitationsList.getSelectedValue() != null && acceptedInvitation == null) {
-            invitationAcceptButton.setEnabled(true);
-        }
-    }//GEN-LAST:event_invitationsListMouseClicked
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(HomeGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(HomeGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(HomeGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(HomeGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new HomeGUI().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton invitationAcceptButton;
@@ -434,7 +440,6 @@ public class HomeGUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane invitationsScroll;
     private javax.swing.JLabel loggedUserLabel;
     private javax.swing.JPanel loggedUserPanel;
-    private javax.swing.JPanel panel;
     private javax.swing.JButton refreshButton;
     private javax.swing.JTextField searchUserField;
     private javax.swing.JLabel selectedUserLabel;

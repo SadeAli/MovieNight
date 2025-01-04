@@ -1,13 +1,17 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package movienightgui;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
+import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -15,7 +19,11 @@ import javax.swing.event.DocumentListener;
  *
  * @author deneg
  */
-public class LobbyGUI extends javax.swing.JFrame {
+public class LobbyPanel extends javax.swing.JPanel {
+
+    private String ownerUser;
+    private String loggedUser;
+    private IDatabase db;
     
     private ArrayList<String> moviesAll = new ArrayList<>();
     private DefaultListModel<String> movies = new DefaultListModel<>();
@@ -26,34 +34,53 @@ public class LobbyGUI extends javax.swing.JFrame {
     private Boolean searchEmpty = true;
     
     private ArrayList<String> votes = new ArrayList<>();
-
+    private final SharedUserModel sharedUserModel;
+    private final JFrame parentFrame;
+    
+    private boolean isReady = false;
+    
+    private final int DELAY = 500;
+    private final int readyWaitSeconds = 10;
+    private int readyWaitCount = 0;
+    
     /**
-     * Creates new form LobbyGUI
+     * Creates new form LobbyPanel
      */
-    public LobbyGUI() {
+    public LobbyPanel(IDatabase db, SharedUserModel sharedUserModel, JFrame parentFrame) {
         initComponents();
-        initSearch();
-        
-        testInit();
+        this.db = db;
+        this.sharedUserModel = sharedUserModel;
+        this.parentFrame = parentFrame;
     }
     
-    public void testInit() {
-        String[] testMovies = {
-            "Fight Club", "Interstellar", "Inception", "Avatar", "Schindler's List",
-            "Tenet", "Black Swan", "All Quite on the Western Front", "Seven"
-        };
-        moviesAll = new ArrayList(Arrays.asList(testMovies));
-        movies.addAll(Arrays.asList(testMovies));
+    public void init() {
+        this.ownerUser = sharedUserModel.getLobby();
+        this.loggedUser = sharedUserModel.getUsername();
+        initSearch();
+        loadMovies();
+        loadLobbyUsers();
+        loadSuggestions();
+        initDatabaseAccessTimer();
+        voteStatusLabel.setText("User \"" + loggedUser + "\" is voting...");
+    }
+    
+    private void loadMovies() {
+        moviesAll = db.getMovies();
+        movies.removeAllElements();
+        movies.addAll(moviesAll);
         moviesList.setModel(movies);
-        
-        String[] testLobby = {"Abc", "Klm", "Xyz"};
-        lobbyUsers.addAll(Arrays.asList(testLobby));
+    }
+    
+    private void loadLobbyUsers() {
+        lobbyUsers.removeAllElements();
+        lobbyUsers.addAll(db.getUsersAtLobby(ownerUser));
         usersInLobbyList.setModel(lobbyUsers);
-        
-        suggestions.addElement("Avatar");
-        suggestions.addElement("Tenet");
-        suggestions.addElement("Black Swan");
-        suggestionsList.setModel(suggestions);        
+    }
+    
+    private void loadSuggestions() {
+        suggestions.removeAllElements();
+        suggestions.addAll(db.getSuggestions(ownerUser));
+        suggestionsList.setModel(suggestions);
     }
     
     private void showSelectedMovieInfo() {
@@ -115,6 +142,30 @@ public class LobbyGUI extends javax.swing.JFrame {
         searchMovieField.setText("Search movie...");
         searchMovieField.setForeground(Color.GRAY);
     }
+    
+    private void initDatabaseAccessTimer() {
+        int delay = 500;
+        ActionListener listener = (ActionEvent e) -> {
+            int userSelectedIndex = usersInLobbyList.getSelectedIndex();
+            
+            System.out.println("Load from DB!");
+            loadLobbyUsers();
+            loadSuggestions();
+            
+            usersInLobbyList.isSelectedIndex(userSelectedIndex);
+            
+            if (!db.isLobbyStillVoting(ownerUser)) {
+                
+            } else if (isReady) {
+                voteStatusLabel.setText(String.format(
+                        "Waiting %d/%d users to be ready...",
+                        db.getLobbyReadyCount(ownerUser),
+                        db.getUsersAtLobby(ownerUser).size()
+                ));
+            }
+        };
+        new Timer(delay, listener).start();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -141,8 +192,7 @@ public class LobbyGUI extends javax.swing.JFrame {
         movieName = new javax.swing.JLabel();
         suggestButton = new javax.swing.JToggleButton();
         voteButton = new javax.swing.JToggleButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        voteStatusLabel = new javax.swing.JLabel();
 
         moviePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Movies", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI Black", 0, 12))); // NOI18N
 
@@ -213,7 +263,7 @@ public class LobbyGUI extends javax.swing.JFrame {
             usersInLobbyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, usersInLobbyPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(usersScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                .addComponent(usersScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -276,6 +326,9 @@ public class LobbyGUI extends javax.swing.JFrame {
             }
         });
 
+        voteStatusLabel.setFont(new java.awt.Font("Segoe Print", 0, 18)); // NOI18N
+        voteStatusLabel.setForeground(new java.awt.Color(255, 0, 0));
+
         javax.swing.GroupLayout movieInfoPanelLayout = new javax.swing.GroupLayout(movieInfoPanel);
         movieInfoPanel.setLayout(movieInfoPanelLayout);
         movieInfoPanelLayout.setHorizontalGroup(
@@ -291,7 +344,8 @@ public class LobbyGUI extends javax.swing.JFrame {
                         .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(suggestButton, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
                             .addComponent(voteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(voteStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         movieInfoPanelLayout.setVerticalGroup(
@@ -304,11 +358,13 @@ public class LobbyGUI extends javax.swing.JFrame {
                 .addComponent(suggestButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(voteButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(voteStatusLabel)
+                .addContainerGap())
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -324,49 +380,19 @@ public class LobbyGUI extends javax.swing.JFrame {
                 .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
                 .addComponent(moviePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(usersInLobbyPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addComponent(suggestionsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(readyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
-            .addComponent(movieInfoPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(movieInfoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void readyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readyButtonActionPerformed
-        // TODO add your handling code here:
-        readyButton.setEnabled(false);
-        suggestButton.setEnabled(false);
-        voteButton.setEnabled(false);
-        moviesList.setEnabled(false);
-        suggestionsList.setEnabled(false);
-        searchMovieField.setEnabled(false);
-        System.out.println("User ready!");
-        System.out.println(votes);
-    }//GEN-LAST:event_readyButtonActionPerformed
-
-    private void moviesListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moviesListMouseClicked
-        // TODO add your handling code here:
-        if (moviesList.getSelectedValue() != null) {
-            selectedMovie = moviesList.getSelectedValue();
-            showSelectedMovieInfo();
-        }
-    }//GEN-LAST:event_moviesListMouseClicked
-
-    private void suggestionsListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_suggestionsListMouseClicked
-        // TODO add your handling code here:
-        if (suggestionsList.getSelectedValue() != null) {
-            selectedMovie = suggestionsList.getSelectedValue();
-            showSelectedMovieInfo();
-        }
-    }//GEN-LAST:event_suggestionsListMouseClicked
 
     private void searchMovieFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_searchMovieFieldFocusGained
         // TODO add your handling code here:
@@ -387,15 +413,47 @@ public class LobbyGUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_searchMovieFieldFocusLost
 
+    private void moviesListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moviesListMouseClicked
+        // TODO add your handling code here:
+        if (moviesList.getSelectedValue() != null) {
+            selectedMovie = moviesList.getSelectedValue();
+            showSelectedMovieInfo();
+        }
+    }//GEN-LAST:event_moviesListMouseClicked
+
+    private void suggestionsListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_suggestionsListMouseClicked
+        // TODO add your handling code here:
+        if (suggestionsList.getSelectedValue() != null) {
+            selectedMovie = suggestionsList.getSelectedValue();
+            showSelectedMovieInfo();
+        }
+    }//GEN-LAST:event_suggestionsListMouseClicked
+
+    private void readyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readyButtonActionPerformed
+        // TODO add your handling code here:
+        readyButton.setEnabled(false);
+        suggestButton.setEnabled(false);
+        voteButton.setEnabled(false);
+        moviesList.setEnabled(false);
+        suggestionsList.setEnabled(false);
+        searchMovieField.setEnabled(false);
+        System.out.println("User ready!");
+        System.out.println(votes);
+        isReady = true;
+        db.updateVotesUserReady(ownerUser, votes);
+    }//GEN-LAST:event_readyButtonActionPerformed
+
     private void suggestButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_suggestButtonActionPerformed
         // TODO add your handling code here:
         if (suggestButton.isSelected()) {
             suggestions.addElement(selectedMovie);
             voteButton.setEnabled(true);
+            db.suggestMovie(ownerUser, selectedMovie);
         } else {
             suggestions.removeElement(selectedMovie);
             votes.remove(selectedMovie);
             voteButton.setEnabled(false);
+            db.removeSuggestion(ownerUser, selectedMovie);
         }
     }//GEN-LAST:event_suggestButtonActionPerformed
 
@@ -407,44 +465,10 @@ public class LobbyGUI extends javax.swing.JFrame {
         } else {
             votes.remove(selectedMovie);
             suggestButton.setEnabled(true);
-        } 
+        }
         System.out.println(votes);
     }//GEN-LAST:event_voteButtonActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LobbyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LobbyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LobbyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LobbyGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new LobbyGUI().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel movieInfoPanel;
@@ -463,5 +487,6 @@ public class LobbyGUI extends javax.swing.JFrame {
     private javax.swing.JPanel usersInLobbyPanel;
     private javax.swing.JScrollPane usersScrollPanel;
     private javax.swing.JToggleButton voteButton;
+    private javax.swing.JLabel voteStatusLabel;
     // End of variables declaration//GEN-END:variables
 }
