@@ -3,6 +3,7 @@ package movienight;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Main {
 	public static void main(String[] args) {
@@ -12,9 +13,7 @@ public class Main {
             
             // Initialize the database (create tables)
             DatabaseInitializer.initialize(connection);
-            
-            // Close the connection
-            connection.close();
+
         } catch (SQLException e) {
             System.out.println("Connection error: " + e.getMessage());
         }
