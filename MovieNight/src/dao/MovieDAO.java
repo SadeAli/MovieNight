@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import models.Movie;
-import models.User;
 
 public class MovieDAO extends AbstractDAO<Movie> {
 

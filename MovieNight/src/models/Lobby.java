@@ -1,13 +1,13 @@
 package models;
 
-import java.time.LocalDate;
+import java.sql.Date;
 
 public class Lobby {
 	int id;
 	int ownerId;
-	LocalDate date;
+	Date date;
 	
-	public Lobby(int id, int ownerId, LocalDate date)
+	public Lobby(int id, int ownerId, Date date)
 	{
 		this.id = id;
 		this.ownerId = ownerId;
@@ -30,11 +30,11 @@ public class Lobby {
 		this.ownerId = ownerId;
 	}
 
-	public LocalDate getDate() {
+	public Date getDate() {
 		return date;
 	}
 
-	public void setDate(LocalDate date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 	
