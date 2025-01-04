@@ -26,6 +26,9 @@ public class DummyDatabase implements IDatabase {
 
     public DummyDatabase() {
         
+        String[] dummyMovies = {"ABC", "DEF", "GHI", "JKL"};
+        movies.addAll(Arrays.asList(dummyMovies));
+        
         String[] dummyUsers = {"a", "b", "c", "d"};
         users.addAll(Arrays.asList(dummyUsers));
         
@@ -41,9 +44,10 @@ public class DummyDatabase implements IDatabase {
             createLobby(users.get(i));
             invitationsAll.put(users.get(i), invitationsForUser);
         }   
+    }
+    
+    public void x() {
         
-        String[] dummyMovies = {"ABC", "DEF", "GHI", "JKL"};
-        movies.addAll(Arrays.asList(dummyMovies));
     }
     
     @Override
@@ -117,6 +121,7 @@ public class DummyDatabase implements IDatabase {
                 lobbyVotes.put(movieName, 0);
             }
             votes.put(ownerUser, lobbyVotes);
+            System.out.println(votes);
         }
     }
 
@@ -141,7 +146,7 @@ public class DummyDatabase implements IDatabase {
             lobbies.remove(ownerUser);
             suggestions.remove(ownerUser);
             votes.remove(ownerUser);
-        }    
+        }
     }
 
     @Override
@@ -163,6 +168,7 @@ public class DummyDatabase implements IDatabase {
 
     @Override
     public void updateVotesUserReady(String ownerUser, ArrayList<String> votedMoviesOfUser) {
+        System.out.println(votes);
         for (String movieName : votedMoviesOfUser) {
             int voteCount = votes.get(ownerUser).get(movieName);
             votes.get(ownerUser).put(movieName, voteCount + 1);
@@ -178,6 +184,17 @@ public class DummyDatabase implements IDatabase {
     @Override
     public int getLobbyReadyCount(String ownerUser) {
         return lobbyReadyCount;
+    }
+
+    @Override
+    public boolean isUsernameExists(String username) {
+        return users.contains(username);
+    }
+
+    @Override
+    public void addUser(String username, String password) {
+        users.add(username);
+        usersAndPasswords.put(username, password);
     }
     
     

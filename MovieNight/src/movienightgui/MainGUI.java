@@ -17,12 +17,26 @@ public class MainGUI extends javax.swing.JFrame {
      */
     public MainGUI(IDatabase db) {
         initComponents();
-        
+
         SharedUserModel sharedUserModel = new SharedUserModel();
         this.getContentPane().setLayout(new CardLayout());
         this.add(new LoginPanel(db, sharedUserModel, this), "login");
         this.add(new HomePanel(db, sharedUserModel, this), "home");
         this.add(new LobbyPanel(db, sharedUserModel, this), "lobby");
+        this.add(new CreateUserPanel(db, this), "create");
+        this.add(new ResultPanel(db, sharedUserModel), "result");
+
+        // Set default card
+        CardLayout layout = (CardLayout) this.getContentPane().getLayout();
+        layout.show(this.getContentPane(), "login");
+
+        // Revalidate and repaint
+        this.getContentPane().revalidate();
+        this.getContentPane().repaint();
+
+        // Resizable and pack AFTER layout setup
+        this.setResizable(false);
+        this.pack();
     }
 
     /**
@@ -77,6 +91,13 @@ public class MainGUI extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(MainGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        
+        try {
+           javax.swing.UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
