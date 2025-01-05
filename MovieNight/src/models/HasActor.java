@@ -1,4 +1,4 @@
-package movienight;
+package models;
 
 public class HasActor {
 
