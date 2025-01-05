@@ -25,60 +25,13 @@ public class CreateUserPanel extends javax.swing.JPanel {
         this.db = db;
         this.parentFrame = parentFrame;
         initComponents();
-        initUsernamePasswordFields();
-        validateUsernamePassword();
+        validateFields();
     }
     
-    private void initUsernamePasswordFields() {
-        usernameField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                validateUsernamePassword();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                validateUsernamePassword();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                validateUsernamePassword();
-            }
-        });
-        passwordField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                validateUsernamePassword();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                validateUsernamePassword();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                validateUsernamePassword();
-            }
-        });
-    }
-    
-    private void validateUsernamePassword() {
+    private boolean validateFields() {
         String username = usernameField.getText();
-        if (db.isUsernameExists(username)) {
-            newUserButton.setEnabled(false);
-            newUserButton.setText("Username Exists");
-        } else if (usernameField.getText().isBlank()) {
-            newUserButton.setEnabled(false);
-            newUserButton.setText("Blank Username");            
-        } else if (String.valueOf(passwordField.getPassword()).isBlank()) {
-            newUserButton.setEnabled(false);
-            newUserButton.setText("Blank Password");              
-        } else {
-            newUserButton.setEnabled(true);
-            newUserButton.setText("Create User");
-        }
+
+        return false;
     }
 
     /**
@@ -97,6 +50,10 @@ public class CreateUserPanel extends javax.swing.JPanel {
         passwordLabel = new javax.swing.JLabel();
         newUserButton = new javax.swing.JButton();
         passwordField = new javax.swing.JPasswordField();
+        cancelButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        birthDateField = new javax.swing.JTextField();
+        creationStatusField = new javax.swing.JLabel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS));
@@ -113,22 +70,40 @@ public class CreateUserPanel extends javax.swing.JPanel {
             }
         });
 
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Birth Date");
+
+        creationStatusField.setForeground(new java.awt.Color(255, 0, 0));
+        creationStatusField.setText(" ");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(creationStatusField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(newUserButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cancelButton))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(usernameLabel)
-                            .addComponent(passwordLabel))
+                            .addComponent(passwordLabel)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(passwordField)
-                            .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(newUserButton))
+                            .addComponent(usernameField, javax.swing.GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE)
+                            .addComponent(birthDateField))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -142,8 +117,16 @@ public class CreateUserPanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(passwordLabel)
                     .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(newUserButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(birthDateField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(4, 4, 4)
+                .addComponent(creationStatusField)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(newUserButton)
+                    .addComponent(cancelButton))
                 .addContainerGap())
         );
 
@@ -151,20 +134,49 @@ public class CreateUserPanel extends javax.swing.JPanel {
         add(filler1);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void newUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newUserButtonActionPerformed
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         // TODO add your handling code here:
         CardLayout cl = (CardLayout) parentFrame.getContentPane().getLayout();
         cl.show(parentFrame.getContentPane(), "login");
-        db.addUser(usernameField.getText(), String.valueOf(passwordField.getPassword()));
         usernameField.setText("");
         passwordField.setText("");
+    }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void newUserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newUserButtonActionPerformed
+        // TODO add your handling code here:
+        String username = usernameField.getText();
+        String password = String.valueOf(passwordField.getPassword());
+        int age;
+        try {
+            age = java.time.LocalDateTime.now().getYear() - Integer.parseInt(birthDateField.getText()); 
+        } catch (NumberFormatException e) {
+            age = 0; 
+        }
+        int status = db.addUser(username, password, age);
         
+        if (status == 1) {
+            creationStatusField.setText("FAILED: Blank Username");
+        } else if (status == 2) {
+            creationStatusField.setText("FAILED: Username Exists");
+        } else if (status == 3) {
+            creationStatusField.setText("FAILED: Blank Password");
+        } else if (status == 4) {
+            creationStatusField.setText("FAILED: Age Constraint");
+        } else {
+            CardLayout cl = (CardLayout) parentFrame.getContentPane().getLayout();
+            cl.show(parentFrame.getContentPane(), "login");
+            usernameField.setText("");
+            passwordField.setText("");
+        }
     }//GEN-LAST:event_newUserButtonActionPerformed
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField birthDateField;
+    private javax.swing.JButton cancelButton;
+    private javax.swing.JLabel creationStatusField;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton newUserButton;
     private javax.swing.JPasswordField passwordField;

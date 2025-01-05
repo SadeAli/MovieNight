@@ -145,6 +145,11 @@ public class HomePanel extends javax.swing.JPanel {
             }
         }
     }
+    
+    private void showLogin() {
+        CardLayout cl = (CardLayout) parentFrame.getContentPane().getLayout();
+        cl.show(parentFrame.getContentPane(), "login");
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -169,6 +174,7 @@ public class HomePanel extends javax.swing.JPanel {
         searchUserField = new javax.swing.JTextField();
         loggedUserPanel = new javax.swing.JPanel();
         loggedUserLabel = new javax.swing.JLabel();
+        deleteButton = new javax.swing.JButton();
         refreshButton = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
@@ -282,20 +288,32 @@ public class HomePanel extends javax.swing.JPanel {
 
         loggedUserLabel.setText("Logged-in username");
 
+        deleteButton.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        deleteButton.setText("Delete User");
+        deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout loggedUserPanelLayout = new javax.swing.GroupLayout(loggedUserPanel);
         loggedUserPanel.setLayout(loggedUserPanelLayout);
         loggedUserPanelLayout.setHorizontalGroup(
             loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(loggedUserPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(loggedUserLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(84, 84, 84))
+                .addComponent(loggedUserLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
+                .addGap(3, 3, 3)
+                .addComponent(deleteButton)
+                .addContainerGap())
         );
         loggedUserPanelLayout.setVerticalGroup(
             loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(loggedUserPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(loggedUserLabel)
+                .addGroup(loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(loggedUserLabel)
+                    .addComponent(deleteButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -399,6 +417,7 @@ public class HomePanel extends javax.swing.JPanel {
             // If no other user is invited, show invitations again.
             if (numOfInvited == 0) {
                 displayInvitations();
+                db.deleteLobby(loggedUser);
             }
         } else {
             numOfInvited += 1;
@@ -407,7 +426,10 @@ public class HomePanel extends javax.swing.JPanel {
             
             // If invited any user, stop displaying other invitations and only
             // display created lobby invitation.            
-            if (numOfInvited >= 1) {
+            if (numOfInvited == 1) {
+                db.createLobby(loggedUser);
+                displayLobbyCreate();
+            } else if (numOfInvited > 1) {
                 displayLobbyCreate();
             }
         }
@@ -445,8 +467,16 @@ public class HomePanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_refreshButtonActionPerformed
 
+    private void deleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteButtonActionPerformed
+        // TODO add your handling code here:
+        if (db.deleteUser(loggedUser)) {
+            showLogin();
+        }
+    }//GEN-LAST:event_deleteButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton deleteButton;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
     private javax.swing.JButton invitationAcceptButton;

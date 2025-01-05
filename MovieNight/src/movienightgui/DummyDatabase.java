@@ -23,6 +23,9 @@ public class DummyDatabase implements IDatabase {
     private HashMap<String, ArrayList<String>> suggestions = new HashMap<>();
     private HashMap<String, HashMap<String, Integer>> votes = new HashMap<>();
     private int lobbyReadyCount = 0;
+    
+    private final int AGE_MIN_LIMIT = 15;
+    private final int AGE_MAX_LIMIT = 80;
 
     public DummyDatabase() {
         
@@ -112,6 +115,8 @@ public class DummyDatabase implements IDatabase {
     @Override
     public void createLobby(String ownerUser) {
         if (!lobbies.containsKey(ownerUser)) {
+            // user creates a new lobby. user cannot create another lobby,
+            // when it already has one.
             lobbies.put(ownerUser, new ArrayList<>());
             lobbies.get(ownerUser).add(ownerUser);
             suggestions.put(ownerUser, new ArrayList<>());
@@ -127,7 +132,8 @@ public class DummyDatabase implements IDatabase {
 
     @Override
     public void addUserToLobby(String ownerUser, String user) {
-        if (lobbies.containsKey(ownerUser) && !lobbies.get(ownerUser).contains(user)) {
+        if (lobbies.containsKey(ownerUser) && !lobbies.get(ownerUser).contains(user) && !lobbies.containsKey(user)) {
+            // If lobby exists and not contains user and user hasn't created another lobby.
             lobbies.get(ownerUser).add(user);
             removeInvitationFromUser(user, ownerUser);
         }
@@ -192,10 +198,30 @@ public class DummyDatabase implements IDatabase {
     }
 
     @Override
-    public void addUser(String username, String password) {
-        users.add(username);
-        usersAndPasswords.put(username, password);
+    public int addUser(String username, String password, int age) {
+        if (username.isBlank()) {
+            return 1;
+        } else if (isUsernameExists(username)) {
+            return 2;
+        } else if (password.isBlank()) {
+            return 3;
+        } else if (age < AGE_MIN_LIMIT || age > AGE_MAX_LIMIT) {
+            return 4;
+        } else {
+            users.add(username);
+            usersAndPasswords.put(username, password);
+            invitationsAll.put(username, new ArrayList<>());
+            return 0;
+        }
     }
+
+    @Override
+    public boolean deleteUser(String username) {
+        
+        // Deletion is allowed only if the user has not created a lobby.
+        System.out.println(!lobbies.containsKey(username));
+        return !lobbies.containsKey(username);
+    } 
     
     
 }

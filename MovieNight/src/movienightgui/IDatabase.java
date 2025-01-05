@@ -152,9 +152,16 @@ public interface IDatabase {
     public boolean isUsernameExists(String username);
     
     /**
-     * Add a new user to the database.
+     * Add a new user to the database. Returns an integer based on the result
+     * of the operation. Returns 0 if successful. Returns 1 if username is blank.
+     * Returns 2 if username exists. Returns 3 if password is blank. Returns 4
+     * if age constraint is violated. Only adds a user when state is 0.
      * @param username
      * @param password
+     * @param age
+     * @return <code>integer</code> based on the parameters
      */
-    public void addUser(String username, String password);
+    public int addUser(String username, String password, int age);
+    
+    public boolean deleteUser(String username);
 }
