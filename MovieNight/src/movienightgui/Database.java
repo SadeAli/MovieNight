@@ -12,10 +12,14 @@ public class Database implements IDatabase {
 	
 	private UserDAO userDAO;
 	private InvitationDAO invitationDAO;
+	private LobbyDAO lobbyDAO;
+	private InLobbyDAO inLobbyDAO;
 	
 	public Database(Connection connection) {
 		this.userDAO = new UserDAO(connection);
 		this.invitationDAO = new InvitationDAO(connection);
+		this.lobbyDAO = new LobbyDAO(connection);
+		this.inLobbyDAO = new InLobbyDAO(connection);
 	}
 	
 	@Override
@@ -30,6 +34,7 @@ public class Database implements IDatabase {
 	@Override
 	public HashMap<String, String> getUsersAndPasswords() {
 		return null;
+		// TODO: Not needed
 	}
 
 	@Override
@@ -75,8 +80,14 @@ public class Database implements IDatabase {
 
 	@Override
 	public ArrayList<String> getUsersAtLobby(String ownerUser) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<String> usernames = new ArrayList<String>();
+		int lobbyOwnerId = userDAO.findByUsername(ownerUser).getId();
+		for (InLobby inLobby : inLobbyDAO.findByLobbyId(lobbyOwnerId)) {
+			int userId = inLobby.getUserId();
+			String username = userDAO.findById(userId).getUsername();
+			usernames.add(username);
+		}
+		return usernames;
 	}
 
 	@Override

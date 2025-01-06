@@ -1,10 +1,14 @@
 package dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import models.InLobby;
+import models.Invitation;
 import models.Lobby;
 import models.User;
 
@@ -35,4 +39,19 @@ public class InLobbyDAO extends AbstractDAO<InLobby> {
 	    String insertQuery = "DELETE FROM " + getTableName() + " where lobby_id = ? and user_id = ?";
 	    return delete(insertQuery, u.getId(), l.getId());
 	}
+	
+    public List<InLobby> findByLobbyId(int lobbyId) {
+    	String query = "SELECT * FROM " + getTableName() + " WHERE lobby_id = ?";
+        List<InLobby> results = new ArrayList<>();
+        try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
+        	stmt.setInt(1, lobbyId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                results.add(mapResultSetToEntity(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("FindAll error: " + e.getMessage());
+        }
+        return results;
+    }
 }
