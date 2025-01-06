@@ -24,4 +24,9 @@ public class LobbyDAO extends AbstractDAO<Lobby> {
 				rs.getDate("date")
 		);
 	}
+
+	public boolean createLobby(Lobby lobby) {
+		String insertQuery = "INSERT INTO " + getTableName() + " (id, owner_id, date) VALUES (?, ?, ?)";
+	    return create(insertQuery, lobby.getId(), lobby.getOwnerId(), lobby.getDate());
+	}
 }
