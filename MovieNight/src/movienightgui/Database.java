@@ -15,6 +15,8 @@ public class Database implements IDatabase {
 	private InLobbyDAO inLobbyDAO;
 	private MovieDAO movieDAO;
 	private SuggestionDAO suggestionDAO;
+	private VoteDAO voteDAO;
+	private LobbyDAO lobbyDAO;
 	
 	public Database(Connection connection) {
 		this.userDAO = new UserDAO(connection);
@@ -22,6 +24,8 @@ public class Database implements IDatabase {
 		this.inLobbyDAO = new InLobbyDAO(connection);
 		this.movieDAO = new MovieDAO(connection);
 		this.suggestionDAO = new SuggestionDAO(connection);
+		this.voteDAO = new VoteDAO(connection);
+		this.lobbyDAO = new LobbyDAO(connection);
 	}
 	
 	@Override
@@ -96,7 +100,7 @@ public class Database implements IDatabase {
 	public ArrayList<String> getMovies() {
 		ArrayList<String> movieTitles = new ArrayList<String>();
 		for (Movie movie : movieDAO.findAll()) {
-			movieTitles.add(movie.getTitle());
+			movieTitles.add(movie.getTitle() + " (" + movie.getId() + ")");
 		}
 		return movieTitles;
 	}
@@ -122,53 +126,83 @@ public class Database implements IDatabase {
 		}
 		return suggestions;
 	}
+	
+	
+    public HashMap<String, Integer> getVotes(String ownerUser) {
+    	return null;
+    	// TODO deprecated
+    }
 
 	@Override
-	public HashMap<String, Integer> getVotes(String ownerUser) {
-		// TODO Auto-generated method stub
-		return null;
+	public HashMap<Integer, Integer> getVotes2(String ownerUser) {
+		
+		// Movie name by vote count.
+		HashMap<Integer, Integer> votes = new HashMap<>();
+		for (Movie movie : movieDAO.findAll()) {
+			votes.put(movie.getId(), 0);
+		}
+		
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		for (User user : userDAO.findAll()) {
+			int userId = user.getId();
+			ArrayList<Vote> userVotes = (ArrayList<Vote>) voteDAO.findVotesOfUser(lobbyId, userId);
+			for (Vote vote : userVotes) {
+				int movieId = movieDAO.findById(vote.getMovieId()).getId();
+				int voteCount = votes.get(movieId);
+				votes.put(movieId, voteCount + 1);
+			}
+		}
+		return votes;
 	}
 
 	@Override
 	public void createLobby(String ownerUser) {
-		// TODO Auto-generated method stub
-		
+		int ownerId = userDAO.findByUsername(ownerUser).getId();
+		lobbyDAO.createLobby(ownerId, ownerId);
+		// TODO what if lobby already exists?
 	}
 
 	@Override
-	public void addUserToLobby(String ownerUser, String user) {
-		// TODO Auto-generated method stub
-		
+	public void addUserToLobby(String ownerUser, String username) {
+		int ownerId = userDAO.findByUsername(ownerUser).getId();
+		Lobby lobby = lobbyDAO.findById(ownerId);
+		User user = userDAO.findByUsername(username);
+		inLobbyDAO.assignUserToLobby(user, lobby);
 	}
 
 	@Override
-	public void removeUserFromLobby(String ownerUser, String user) {
-		// TODO Auto-generated method stub
-		
+	public void removeUserFromLobby(String ownerUser, String username) {
+		int ownerId = userDAO.findByUsername(ownerUser).getId();
+		Lobby lobby = lobbyDAO.findById(ownerId);
+		User user = userDAO.findByUsername(username);
+		inLobbyDAO.removeUserToLobby(user, lobby);
 	}
 
 	@Override
 	public void deleteLobby(String ownerUser) {
-		// TODO Auto-generated method stub
-		
+		int ownerId = userDAO.findByUsername(ownerUser).getId();
+		lobbyDAO.deleteLobby(ownerId);
+		// TODO Keep in mind, ownerId == lobbyId
 	}
 
 	@Override
-	public void removeSuggestion(String ownerUser, String movieName) {
-		// TODO Auto-generated method stub
-		
+	public void removeSuggestion(String ownerUser, String user, String movieName) {
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		int userId = userDAO.findByUsername(user).getId();
+		suggestionDAO.removeSuggestion(lobbyId, userId);		
 	}
 
 	@Override
 	public String getBelongingLobbyOwner(String user) {
-		// TODO Auto-generated method stub
-		return null;
+		int userId = userDAO.findByUsername(user).getId();
+		int ownerId = inLobbyDAO.findByUserId(userId).getLobbyId();
+		return userDAO.findById(ownerId).getUsername();
 	}
 
 	@Override
 	public void updateVotesUserReady(String ownerUser, ArrayList<String> votedMoviesOfUser) {
-		// TODO Auto-generated method stub
-		
+		// TODO deprecated probably...
+		// But if ready, prevent continuing?
 	}
 
 	@Override
@@ -205,6 +239,12 @@ public class Database implements IDatabase {
 	public void suggestMovie(String ownerUser, String movieName) {
 		// TODO Auto-generated method stub
 		// TODO depreciated...
+	}
+
+	@Override
+	public void removeSuggestion(String ownerUser, String movieName) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

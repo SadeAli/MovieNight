@@ -168,5 +168,8 @@ public interface IDatabase {
     public boolean validateLogin(String username, String password);
     
     public void suggestMovie(String lobbyId, String user, int movieId);
+    
+    public HashMap<Integer, Integer> getVotes2(String ownerUser);
 
+	public void removeSuggestion(String ownerUser, String user, String movieName);
 }

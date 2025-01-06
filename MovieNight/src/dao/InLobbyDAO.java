@@ -54,4 +54,18 @@ public class InLobbyDAO extends AbstractDAO<InLobby> {
         }
         return results;
     }
+    
+    public InLobby findByUserId(int userId) {
+    	String query = "SELECT * FROM " + getTableName() + " WHERE user_id = ?";
+        try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
+        	stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                return mapResultSetToEntity(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("FindAll error: " + e.getMessage());
+        }
+        return null;
+    }
 }
