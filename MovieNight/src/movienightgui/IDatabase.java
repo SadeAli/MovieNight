@@ -166,4 +166,7 @@ public interface IDatabase {
     public boolean deleteUser(String username);
     
     public boolean validateLogin(String username, String password);
+    
+    public void suggestMovie(String lobbyId, String user, int movieId);
+
 }

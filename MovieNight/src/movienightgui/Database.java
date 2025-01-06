@@ -12,14 +12,16 @@ public class Database implements IDatabase {
 	
 	private UserDAO userDAO;
 	private InvitationDAO invitationDAO;
-	private LobbyDAO lobbyDAO;
 	private InLobbyDAO inLobbyDAO;
+	private MovieDAO movieDAO;
+	private SuggestionDAO suggestionDAO;
 	
 	public Database(Connection connection) {
 		this.userDAO = new UserDAO(connection);
 		this.invitationDAO = new InvitationDAO(connection);
-		this.lobbyDAO = new LobbyDAO(connection);
 		this.inLobbyDAO = new InLobbyDAO(connection);
+		this.movieDAO = new MovieDAO(connection);
+		this.suggestionDAO = new SuggestionDAO(connection);
 	}
 	
 	@Override
@@ -92,20 +94,33 @@ public class Database implements IDatabase {
 
 	@Override
 	public ArrayList<String> getMovies() {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<String> movieTitles = new ArrayList<String>();
+		for (Movie movie : movieDAO.findAll()) {
+			movieTitles.add(movie.getTitle());
+		}
+		return movieTitles;
 	}
 
 	@Override
-	public void suggestMovie(String ownerUser, String movieName) {
-		// TODO Auto-generated method stub
-		
+	public void suggestMovie(String ownerUser, String user, int movieId) {
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		int userId = userDAO.findByUsername(user).getId();
+		suggestionDAO.addSuggestion(lobbyId, userId, movieId);
+		// TODO: Do not insert if suggestion already exists.
 	}
 
 	@Override
 	public ArrayList<String> getSuggestions(String ownerUser) {
-		// TODO Auto-generated method stub
-		return null;
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		ArrayList<String> suggestions = new ArrayList<String>();
+		for (Suggestion suggestion : suggestionDAO.findByLobbyId(lobbyId)) {
+			int movieId = suggestion.getMovieId();
+			int userId = suggestion.getSuggestedBy();
+			String movieTitle = movieDAO.findById(movieId).getTitle();
+			String username = userDAO.findById(userId).getUsername();
+			suggestions.add(movieTitle + " (" + username + ")");
+		}
+		return suggestions;
 	}
 
 	@Override
@@ -184,6 +199,12 @@ public class Database implements IDatabase {
 	public boolean deleteUser(String username) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void suggestMovie(String ownerUser, String movieName) {
+		// TODO Auto-generated method stub
+		// TODO depreciated...
 	}
 
 	

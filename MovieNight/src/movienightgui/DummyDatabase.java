@@ -229,6 +229,8 @@ public class DummyDatabase implements IDatabase {
 		return false;
 	} 
     
-    
+    @Override
+    public void suggestMovie(String ownerUser, String user, int movieId) {
+	}
     
 }
