@@ -164,4 +164,6 @@ public interface IDatabase {
     public int addUser(String username, String password, int age);
     
     public boolean deleteUser(String username);
+    
+    public boolean validateLogin(String username, String password);
 }

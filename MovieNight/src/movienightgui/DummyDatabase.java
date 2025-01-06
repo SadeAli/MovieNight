@@ -221,7 +221,14 @@ public class DummyDatabase implements IDatabase {
         // Deletion is allowed only if the user has not created a lobby.
         System.out.println(!lobbies.containsKey(username));
         return !lobbies.containsKey(username);
-    } 
+    }
+
+	@Override
+	public boolean validateLogin(String username, String password) {
+		// TODO Auto-generated method stub
+		return false;
+	} 
+    
     
     
 }
