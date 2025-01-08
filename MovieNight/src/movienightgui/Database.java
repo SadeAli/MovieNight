@@ -190,6 +190,8 @@ public class Database implements IDatabase {
 		int ownerId = userDAO.findByUsername(ownerUser).getId();
 		Lobby lobby = lobbyDAO.findById(ownerId);
 		User user = userDAO.findByUsername(username);
+		System.out.println(ownerId);
+
 		inLobbyDAO.assignUserToLobby(user, lobby);
 	}
 

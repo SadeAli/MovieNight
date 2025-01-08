@@ -401,7 +401,7 @@ public class HomePanel extends javax.swing.JPanel {
                 System.out.println("Creating a new lobby...");
                 sharedUserModel.setLobby(loggedUser);
             }
-            db.addUserToLobby(sharedUserModel.getLobby(), loggedUser);
+            db.addUserToLobby(acceptedInvitation, loggedUser);
             showLobby();
         }
     }//GEN-LAST:event_invitationAcceptButtonActionPerformed

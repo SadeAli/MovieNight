@@ -32,12 +32,12 @@ public class InLobbyDAO extends AbstractDAO<InLobby> {
 	
 	public boolean assignUserToLobby(User u, Lobby l) {
 	    String insertQuery = "INSERT INTO " + getTableName() + " (lobby_id, user_id) VALUES (?, ?)";
-	    return create(insertQuery, u.getId(), l.getId());
+	    return create(insertQuery, l.getId(), u.getId());
 	}
 	
 	public boolean removeUserToLobby(User u, Lobby l) {
 	    String insertQuery = "DELETE FROM " + getTableName() + " where lobby_id = ? and user_id = ?";
-	    return delete(insertQuery, u.getId(), l.getId());
+	    return delete(insertQuery, l.getId(), u.getId());
 	}
 	
     public List<InLobby> findByLobbyId(int lobbyId) {
