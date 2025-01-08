@@ -39,8 +39,9 @@ public class LoginPanel extends javax.swing.JPanel {
      * @param password
      */
     private void validateLogin(String username, String password) {
-
-        if (usersAndPasswords.containsKey(username) && usersAndPasswords.get(username).equals(password)) {
+    	
+    	boolean isLoginSuccessful = db.validateLogin(username, password);
+        if (isLoginSuccessful) {
             System.out.println("Login succesful!");
             loggedUsername = username;
             sharedUserModel.setUsername(username);
