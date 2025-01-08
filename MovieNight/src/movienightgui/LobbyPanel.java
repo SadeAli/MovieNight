@@ -43,6 +43,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private final int DELAY = 500;
     private final int READYWAITSECONDS = 10;
     private int readyWaitCounter = 0;
+    private Timer timer;
     
     /**
      * Creates new form LobbyPanel
@@ -51,7 +52,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         initComponents();
         this.db = db;
         this.sharedUserModel = sharedUserModel;
-        this.parentFrame = parentFrame;
+        this.parentFrame = parentFrame;        
     }
     
     public void init() {
@@ -64,6 +65,14 @@ public class LobbyPanel extends javax.swing.JPanel {
         initDatabaseAccessTimer();
         voteStatusLabel.setText("User \"" + loggedUser + "\" is voting...");
         this.parentFrame.pack();
+        
+        String username = sharedUserModel.getUsername();
+        this.ownerUser = db.getBelongingLobbyOwner(username);
+        if (!username.equals(ownerUser)) {
+        	readyButton.setEnabled(false);
+        } else {
+        	readyButton.setEnabled(true);
+        }
     }
     
     private void loadMovies() {
@@ -149,7 +158,6 @@ public class LobbyPanel extends javax.swing.JPanel {
         ActionListener listener = (ActionEvent e) -> {
             int userSelectedIndex = usersInLobbyList.getSelectedIndex();
             
-            System.out.println("Load from DB!");
             loadLobbyUsers();
             loadSuggestions();
             
@@ -163,16 +171,12 @@ public class LobbyPanel extends javax.swing.JPanel {
                     readyWaitCounter += 1;
                 } else {
                     showResults();
+                    timer.stop();
                 }
-            } else if (isReady) {
-                voteStatusLabel.setText(String.format(
-                        "Waiting %d/%d users to be ready...",
-                        db.getLobbyReadyCount(ownerUser),
-                        db.getUsersAtLobby(ownerUser).size()
-                ));
-            }
+            } 
         };
-        new Timer(DELAY, listener).start();
+        this.timer = new Timer(DELAY, listener);
+        this.timer.start();
     }
     
     private void showResults() {
@@ -463,17 +467,12 @@ public class LobbyPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_suggestionsListMouseClicked
 
     private void readyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readyButtonActionPerformed
-        // TODO add your handling code here:
-        readyButton.setEnabled(false);
-        suggestButton.setEnabled(false);
-        voteButton.setEnabled(false);
-        moviesList.setEnabled(false);
-        suggestionsList.setEnabled(false);
-        searchMovieField.setEnabled(false);
         System.out.println("User ready!");
         System.out.println(votes);
         isReady = true;
-        db.updateVotesUserReady(ownerUser, votes);
+        db.setLobbyReady(ownerUser);
+        readyButton.setEnabled(false);
+        System.out.println("ready then?");
     }//GEN-LAST:event_readyButtonActionPerformed
 
     private void suggestButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_suggestButtonActionPerformed

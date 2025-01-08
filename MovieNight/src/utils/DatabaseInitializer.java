@@ -52,6 +52,7 @@ public class DatabaseInitializer {
 				CREATE TABLE IF NOT EXISTS Lobby(
 					id SERIAL PRIMARY KEY,
 					owner_id INTEGER REFERENCES "User"(id),
+					is_ready BOOLEAN DEFAULT FALSE,
 					date DATE
 				);
 				
@@ -84,6 +85,24 @@ public class DatabaseInitializer {
 			""";
 			stmt.execute(createTables);
 			System.out.println("Tables created successfully!.");
+		} catch (Exception e) {
+			System.err.println("Hata: " + e.getMessage());
+		}
+	}
+	
+	public static void reset(Connection connection) {
+		
+		try(Statement stmt = connection.createStatement()){
+			
+			String removeTables = """
+				DROP SCHEMA public CASCADE;
+				CREATE SCHEMA public;
+			""";
+			stmt.execute(removeTables);
+			System.out.println("Tables removed successfully!.");
+			
+			initialize(connection);
+			
 		} catch (Exception e) {
 			System.err.println("Hata: " + e.getMessage());
 		}

@@ -40,6 +40,11 @@ public class InLobbyDAO extends AbstractDAO<InLobby> {
 	    return delete(insertQuery, l.getId(), u.getId());
 	}
 	
+	public boolean removeAllUsers(Lobby l) {
+	    String insertQuery = "DELETE FROM " + getTableName() + " where lobby_id = ?";
+	    return delete(insertQuery, l.getId());
+	}
+	
     public List<InLobby> findByLobbyId(int lobbyId) {
     	String query = "SELECT * FROM " + getTableName() + " WHERE lobby_id = ?";
         List<InLobby> results = new ArrayList<>();

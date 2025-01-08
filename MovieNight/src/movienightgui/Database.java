@@ -232,8 +232,8 @@ public class Database implements IDatabase {
 
 	@Override
 	public boolean isLobbyStillVoting(String ownerUser) {
-		// TODO Auto-generated method stub
-		return false;
+		int ownerId = userDAO.findByUsername(ownerUser).getId();
+		return !lobbyDAO.findById(ownerId).isReady();
 	}
 
 	@Override
@@ -302,5 +302,23 @@ public class Database implements IDatabase {
 	    }
 	}
 
+	@Override
+	public void setLobbyReady(String ownerUser) {
+		lobbyDAO.setLobbyReady(userDAO.findByUsername(ownerUser).getId());
+	}
+
+	@Override
+	public void emptyLobby(String ownerUser) {
+		int ownerId = userDAO.findByUsername(ownerUser).getId();
+		Lobby lobby = lobbyDAO.findById(ownerId);
+		inLobbyDAO.removeAllUsers(lobby);
+	}
+
+	@Override
+	public void emptyInvitations(String sender) {
+		int ownerId = userDAO.findByUsername(sender).getId();
+		invitationDAO.removeAllInvitations(ownerId);
+	}
+	
 	
 }

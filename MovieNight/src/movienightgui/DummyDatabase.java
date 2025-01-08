@@ -246,5 +246,23 @@ public class DummyDatabase implements IDatabase {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void setLobbyReady(String ownerUser) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void emptyLobby(String ownerUser) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void emptyInvitations(String sender) {
+		// TODO Auto-generated method stub
+		
+	}
     
 }

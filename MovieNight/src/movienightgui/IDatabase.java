@@ -174,4 +174,10 @@ public interface IDatabase {
 	public ArrayList<String> getInvitationsOfUser(String username);
     
     public void removeSuggestion(String ownerUser, String user, String movieName);
+
+    public void setLobbyReady(String ownerUser);
+
+	public void emptyLobby(String ownerUser);
+	
+	public void emptyInvitations(String sender);
 }

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.Invitation;
+import models.Lobby;
 
 public class InvitationDAO extends AbstractDAO<Invitation> {
 	public InvitationDAO(Connection connection) {
@@ -36,6 +37,11 @@ public class InvitationDAO extends AbstractDAO<Invitation> {
 	public boolean deleteInvitation(int senderId, int receiverId) {
 	    String deleteQuery = "DELETE FROM " + getTableName() + " WHERE sender_id = ? AND receiver_id = ?";
 	    return delete(deleteQuery, senderId, receiverId);
+	}
+	
+	public boolean removeAllInvitations(int senderId) {
+	    String insertQuery = "DELETE FROM " + getTableName() + " where sender_id = ?";
+	    return delete(insertQuery, senderId);
 	}
 	
     public List<Invitation> findByReceiver(int receiverId) {
