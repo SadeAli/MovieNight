@@ -55,5 +55,21 @@ public class SuggestionDAO extends AbstractDAO<Suggestion> {
         }
         return results;
     }
-
+    
+    public boolean suggestionExists(int lobbyId, int userId, int movieId) {
+        String query = "SELECT COUNT(*) FROM suggestion WHERE lobbyId = ? AND suggestedBy = ? AND movieId = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, lobbyId);
+            stmt.setInt(2, userId);
+            stmt.setInt(3, movieId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0; // Return true if count > 0
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking suggestion existence: " + e.getMessage());
+        }
+        return false;
+    }
 }

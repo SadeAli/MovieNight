@@ -109,8 +109,12 @@ public class Database implements IDatabase {
 	public void suggestMovie(String ownerUser, String user, int movieId) {
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
 		int userId = userDAO.findByUsername(user).getId();
-		suggestionDAO.addSuggestion(lobbyId, userId, movieId);
-		// TODO: Do not insert if suggestion already exists.
+	    // Check if the suggestion already exists
+	    if (!suggestionDAO.suggestionExists(lobbyId, userId, movieId)) {
+	        suggestionDAO.addSuggestion(lobbyId, userId, movieId);
+	    } else {
+	        System.out.println("Suggestion already exists.");
+	    }
 	}
 
 	@Override
@@ -157,9 +161,14 @@ public class Database implements IDatabase {
 
 	@Override
 	public void createLobby(String ownerUser) {
-		int ownerId = userDAO.findByUsername(ownerUser).getId();
-		lobbyDAO.createLobby(ownerId, ownerId);
-		// TODO what if lobby already exists?
+	    int ownerId = userDAO.findByUsername(ownerUser).getId();
+
+	    // Check if a lobby already exists for this owner
+	    if (!lobbyDAO.lobbyExists(ownerId)) {
+	        lobbyDAO.createLobby(ownerId, ownerId);
+	    } else {
+	        System.out.println("Lobby already exists for user: " + ownerUser);
+	    }
 	}
 
 	@Override
@@ -219,32 +228,60 @@ public class Database implements IDatabase {
 
 	@Override
 	public boolean isUsernameExists(String username) {
-		// TODO Auto-generated method stub
-		return false;
+		return userDAO.findByUsername(username) != null;
 	}
 
 	@Override
 	public int addUser(String username, String password, int age) {
-		// TODO Auto-generated method stub
-		return 0;
+	    // Check if the username is blank
+	    if (username == null || username.trim().isEmpty()) {
+	        return 1; // Username is blank
+	    }
+
+	    // Check if the username already exists
+	    if (userDAO.findByUsername(username) != null) {
+	        return 2; // Username already exists
+	    }
+
+	    // Check if the password is blank
+	    if (password == null || password.trim().isEmpty()) {
+	        return 3; // Password is blank
+	    }
+
+	    // Check if the age constraint is violated (e.g., minimum age requirement)
+	    if (age < 18) { // Assuming 18 is the minimum age
+	        return 4; // Age constraint violated
+	    }
+
+	    // If all checks pass, create and add the user to the database
+	    User newUser = new User(username, password, age);
+	    userDAO.addUser(newUser);
+
+	    return 0; // Success
 	}
 
 	@Override
 	public boolean deleteUser(String username) {
-		// TODO Auto-generated method stub
-		return false;
+	    User user = userDAO.findByUsername(username);
+	    return userDAO.deleteById(user.getId());
 	}
 
 	@Override
 	public void suggestMovie(String ownerUser, String movieName) {
-		// TODO Auto-generated method stub
-		// TODO depreciated...
+	    int lobbyId = userDAO.findByUsername(ownerUser).getId();
+	    Movie movie = movieDAO.findByTitle(movieName);
+	    if (movie != null) {
+	        suggestionDAO.addSuggestion(lobbyId, lobbyId, movie.getId());
+	    }
 	}
 
 	@Override
 	public void removeSuggestion(String ownerUser, String movieName) {
-		// TODO Auto-generated method stub
-		
+	    int lobbyId = userDAO.findByUsername(ownerUser).getId();
+	    Movie movie = movieDAO.findByTitle(movieName);
+	    if (movie != null) {
+	        suggestionDAO.removeSuggestion(lobbyId, lobbyId);
+	    }
 	}
 
 	

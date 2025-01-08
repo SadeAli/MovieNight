@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractDAO<T> {
-	private final Connection connection;
+	protected final Connection connection;
 	
 	public AbstractDAO(Connection connection){
 		this.connection = connection;
