@@ -16,7 +16,8 @@ public class DatabaseInitializer {
                     lname VARCHAR(50),
                     username VARCHAR(50) UNIQUE,
                     password VARCHAR(50),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP    
+                    age INT CHECK (age >= 18)
                 );
 				
 				CREATE TABLE IF NOT EXISTS Movie(

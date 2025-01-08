@@ -257,7 +257,7 @@ public class Database implements IDatabase {
 	    // If all checks pass, create and add the user to the database
 	    Random rn = new Random();
 	    int userId = rn.nextInt(100000);
-	    User newUser = new User(userId, "", "", username, password, "");
+	    User newUser = new User(userId, "", "", username, password, "", age);
 	    userDAO.createUser(newUser);
 
 	    return 0; // Success

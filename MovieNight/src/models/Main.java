@@ -19,16 +19,6 @@ public class Main {
             // Initialize the database (create tables)
             DatabaseInitializer.initialize(connection);
 
-            // Test
-            UserDAO userDAO = new UserDAO(connection);
-            // Kullanıcı ekle
-            User newUser = new User(0, "Jane", "Doe", "janedoe", "password123", null);
-            userDAO.createUser(newUser);
-
-            // Kullanıcıları listele
-            List<User> users = userDAO.findAll();
-            users.forEach(user -> System.out.println(user.getUsername()));
-
             // Close the connection
             connection.close();
         } catch (SQLException e) {

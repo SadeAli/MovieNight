@@ -26,7 +26,8 @@ public class UserDAO extends AbstractDAO<User> {
                 rs.getString("lname"),
                 rs.getString("username"),
                 rs.getString("password"),
-                rs.getString("created_at")
+                rs.getString("created_at"),
+                rs.getInt("age")
         );
     }
 	
