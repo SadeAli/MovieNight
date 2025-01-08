@@ -164,6 +164,24 @@ public class Database implements IDatabase {
 		}
 		return votes;
 	}
+	
+	@Override
+	public Movie getMostVotedMovie(String ownerUser) {
+	    // Get lobbyId based on the owner user
+	    int lobbyId = userDAO.findByUsername(ownerUser).getId();
+
+	    // Call the getMostVotedMovieIdInLobby method to get the most voted movie ID in the lobby
+	    int mostVotedMovieId = voteDAO.getMostVotedMovieIdInLobby(lobbyId);
+
+	    // If no movie ID was found (i.e., -1), return null or handle accordingly
+	    if (mostVotedMovieId == -1) {
+	    	System.out.println("No votes found for any movie in the lobby with ID: " + lobbyId);
+	        return null;
+	    }
+
+	    // If a valid movie ID is found, query the movie using that ID
+	    return movieDAO.findById(mostVotedMovieId); // Assuming movieDAO is available and has a method like 'findById'
+	}
 
 	@Override
 	public void createLobby(String ownerUser) {

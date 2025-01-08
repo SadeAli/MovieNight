@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.Movie;
 import models.Suggestion;
 import models.Vote;
 
@@ -44,5 +45,34 @@ public class VoteDAO extends AbstractDAO<Vote> {
         }
         return results;
     }
+    
+    public int getMostVotedMovieIdInLobby(int lobbyId) {
+        String query = """
+            SELECT movie_id, COUNT(*) AS vote_count
+            FROM votes
+            WHERE lobby_id = ?
+            GROUP BY movie_id
+            HAVING COUNT(*) = (
+                SELECT MAX(vote_count) 
+                FROM (
+                    SELECT COUNT(*) AS vote_count 
+                    FROM votes
+                    WHERE lobby_id = ?
+                    GROUP BY movie_id
+                ) AS vote_counts
+            );
+        """;
 
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, lobbyId);  
+            stmt.setInt(2, lobbyId); 
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("movie_id");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching most voted movie ID in lobby: " + e.getMessage());
+        }
+        return -1;
+    }
 }
