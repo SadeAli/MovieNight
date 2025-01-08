@@ -66,7 +66,19 @@ public class Database implements IDatabase {
 		return invitationSenders;
 	}
 	
-
+	@Override
+	public ArrayList<String> getInvitationsOfUser(String username) {
+		int senderId = userDAO.findByUsername(username).getId();
+		List<Invitation> invitations = invitationDAO.findBySender(senderId);
+		ArrayList<String> invitationReceivers = new ArrayList<String>();
+		
+		for (Invitation invitation : invitations) {
+			int receiverId = invitation.getReceiverId();
+			invitationReceivers.add(userDAO.findById(receiverId).getUsername());
+		}
+		return invitationReceivers;
+	}
+	
 	@Override
 	public void sendInvitationToUser(String fromUser, String toUser) {
 		int senderId = userDAO.findByUsername(fromUser).getId();
@@ -166,6 +178,7 @@ public class Database implements IDatabase {
 
 	    // Check if a lobby already exists for this owner
 	    if (!lobbyDAO.lobbyExists(ownerId)) {
+	    	System.out.println("creating new lobby!");
 	        lobbyDAO.createLobby(ownerId, ownerId);
 	    } else {
 	        System.out.println("Lobby already exists for user: " + ownerUser);

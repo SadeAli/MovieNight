@@ -171,5 +171,7 @@ public interface IDatabase {
     
     public HashMap<Integer, Integer> getVotes2(String ownerUser);
 
-	public void removeSuggestion(String ownerUser, String user, String movieName);
+	public ArrayList<String> getInvitationsOfUser(String username);
+    
+    public void removeSuggestion(String ownerUser, String user, String movieName);
 }

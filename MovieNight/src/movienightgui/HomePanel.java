@@ -69,9 +69,7 @@ public class HomePanel extends javax.swing.JPanel {
         loadUsers();
         loadInvitations();
 
-        for (String user : users) {
-            usersAndInvitations.put(user, false);
-        }
+        userInviteCancelButton.setEnabled(false);
     }
     
     private void initSearch() {
@@ -115,13 +113,37 @@ public class HomePanel extends javax.swing.JPanel {
         usersModel.removeAllElements();
         usersModel.addAll(users); 
         usersList.setModel(usersModel);
+        
+        for (String user : users) {
+        	if (!usersAndInvitations.containsKey(user)) {
+        		usersAndInvitations.put(user, false);
+        	}
+        } // Update for newly created users
+        
+        for (String user : usersAndInvitations.keySet()) {
+        	if (!users.contains(user)) {
+        		usersAndInvitations.remove(user);
+        	}
+        } // Update for deleted users
     }
     
     private void loadInvitations() {
-       invitations = db.getInvitiationsForUser(loggedUser);
-       invitationsModel.removeAllElements();
-       invitationsModel.addAll(invitations);
-       invitationsList.setModel(invitationsModel);
+    	// invitations to logged user
+    	invitations = db.getInvitiationsForUser(loggedUser);
+    	invitationsModel.removeAllElements();
+    	invitationsModel.addAll(invitations);
+    	invitationsList.setModel(invitationsModel);
+    	
+    	System.out.println(db.getInvitationsOfUser(loggedUser));
+    	
+    	// invitations sent from the logged user
+    	for (String user : db.getInvitationsOfUser(loggedUser)) {
+    		usersAndInvitations.put(user, true);
+    	}
+    	
+    	if (db.getInvitationsOfUser(loggedUser).size() > 0) {
+    		displayLobbyCreate();
+    	}
     }
     
     private void displayInvitations() {
@@ -396,7 +418,8 @@ public class HomePanel extends javax.swing.JPanel {
         } else {
             userInviteCancelButton.setEnabled(true);
         }
-
+        
+        System.out.println(usersAndInvitations);
         if (!usersAndInvitations.get(selectedUser)) {
             userInviteCancelButton.setText("Invite");
         } else {
@@ -421,17 +444,20 @@ public class HomePanel extends javax.swing.JPanel {
             }
         } else {
             numOfInvited += 1;
-            userInviteCancelButton.setText("Cancel");
-            db.sendInvitationToUser(loggedUser, selectedUser);
             
             // If invited any user, stop displaying other invitations and only
             // display created lobby invitation.            
             if (numOfInvited == 1) {
+            	System.out.println("Creating lobby...");
                 db.createLobby(loggedUser);
                 displayLobbyCreate();
             } else if (numOfInvited > 1) {
                 displayLobbyCreate();
             }
+            
+            // Create a lobby first, then send invitation.
+            userInviteCancelButton.setText("Cancel");
+            db.sendInvitationToUser(loggedUser, selectedUser);
         }
         System.out.println(selectedUser + db.getInvitiationsForUser(selectedUser));
     }//GEN-LAST:event_userInviteCancelButtonActionPerformed

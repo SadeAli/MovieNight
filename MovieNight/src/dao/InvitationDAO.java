@@ -24,7 +24,7 @@ public class InvitationDAO extends AbstractDAO<Invitation> {
 		return new Invitation(
 				rs.getInt("sender_id"),
 				rs.getInt("lobby_id"),
-				rs.getInt("receviver_id")
+				rs.getInt("receiver_id")
 		);
 	}
 	
@@ -43,6 +43,21 @@ public class InvitationDAO extends AbstractDAO<Invitation> {
         List<Invitation> results = new ArrayList<>();
         try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
         	stmt.setInt(1, receiverId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                results.add(mapResultSetToEntity(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("FindAll error: " + e.getMessage());
+        }
+        return results;
+    }
+    
+    public List<Invitation> findBySender(int senderId) {
+    	String query = "SELECT * FROM " + getTableName() + " WHERE sender_id = ?";
+        List<Invitation> results = new ArrayList<>();
+        try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
+        	stmt.setInt(1, senderId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 results.add(mapResultSetToEntity(rs));

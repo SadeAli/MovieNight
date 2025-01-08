@@ -49,10 +49,6 @@ public class DummyDatabase implements IDatabase {
         }   
     }
     
-    public void x() {
-        
-    }
-    
     @Override
     public HashMap<String, String> getUsersAndPasswords() {
         return usersAndPasswords;
@@ -243,6 +239,12 @@ public class DummyDatabase implements IDatabase {
 	public void removeSuggestion(String ownerUser, String user, String movieName) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public ArrayList<String> getInvitationsOfUser(String username) {
+		// TODO Auto-generated method stub
+		return null;
 	}
     
 }

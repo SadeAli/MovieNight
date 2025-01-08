@@ -27,7 +27,7 @@ public class LobbyDAO extends AbstractDAO<Lobby> {
 	}
 	
 	public boolean createLobby(int lobbyId, int ownerId) {
-	    String insertQuery = "INSERT INTO " + getTableName() + " (lobby_id, owner_id, date) VALUES (?, ?, 0)";
+	    String insertQuery = "INSERT INTO " + getTableName() + " (id, owner_id, date) VALUES (?, ?, now())";
 	    return create(insertQuery, lobbyId, ownerId);
 	}
 	
