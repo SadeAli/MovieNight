@@ -9,6 +9,8 @@ import java.util.List;
 
 import models.Invitation;
 import models.Lobby;
+import models.Lobby;
+import models.User;
 
 public class InvitationDAO extends AbstractDAO<Invitation> {
 	public InvitationDAO(Connection connection) {
@@ -73,4 +75,8 @@ public class InvitationDAO extends AbstractDAO<Invitation> {
         }
         return results;
     }
+	public boolean sendInvitation(User sender, Lobby lobby, User receiver) {
+		String insertQuery = "INSERT INTO " + getTableName() + " (sender_id, lobby_id, receiver_id) VALUES (?, ?, ?)";
+	    return create(insertQuery, sender.getId(), lobby.getId(), receiver.getId());
+	}
 }

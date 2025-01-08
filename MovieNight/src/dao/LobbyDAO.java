@@ -56,4 +56,9 @@ public class LobbyDAO extends AbstractDAO<Lobby> {
 		String updateQuery = "UPDATE " + getTableName() + " SET is_ready = TRUE WHERE id = ?";
 		return update(updateQuery, lobbyId);
 	}
+
+	public boolean createLobby(Lobby lobby) {
+		String insertQuery = "INSERT INTO " + getTableName() + " (id, owner_id, date) VALUES (?, ?, ?)";
+	    return create(insertQuery, lobby.getId(), lobby.getOwnerId(), lobby.getDate());
+	}
 }
