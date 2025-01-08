@@ -44,6 +44,11 @@ public class Database implements IDatabase {
 		// TODO: Not needed
 	}
 
+    @Override
+    public boolean updatePassword(String username, String oldPassword, String newPassword) {
+        return userDAO.updatePassword(username, oldPassword, newPassword);
+    }
+    
 	@Override
 	public ArrayList<String> getUsers() {
 		ArrayList<String> usernames = new ArrayList<>();

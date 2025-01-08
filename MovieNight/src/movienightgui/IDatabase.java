@@ -172,4 +172,6 @@ public interface IDatabase {
     public HashMap<Integer, Integer> getVotes2(String ownerUser);
 
 	public void removeSuggestion(String ownerUser, String user, String movieName);
+	
+	public boolean updatePassword(String username, String oldPassword, String newPassword);
 }

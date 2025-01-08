@@ -244,5 +244,11 @@ public class DummyDatabase implements IDatabase {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public boolean updatePassword(String username, String oldPassword, String newPassword) {
+		// TODO Auto-generated method stub
+		return false;
+	}
     
 }
