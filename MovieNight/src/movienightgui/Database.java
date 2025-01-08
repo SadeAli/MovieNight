@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import dao.*;
 import models.*;
@@ -254,8 +255,10 @@ public class Database implements IDatabase {
 	    }
 
 	    // If all checks pass, create and add the user to the database
-	    User newUser = new User(username, password, age);
-	    userDAO.addUser(newUser);
+	    Random rn = new Random();
+	    int userId = rn.nextInt(100000);
+	    User newUser = new User(userId, "", "", username, password, "");
+	    userDAO.createUser(newUser);
 
 	    return 0; // Success
 	}
