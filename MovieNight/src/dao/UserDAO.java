@@ -32,8 +32,8 @@ public class UserDAO extends AbstractDAO<User> {
     }
 	
 	public boolean createUser(User user) {
-	    String insertQuery = "INSERT INTO " + getTableName() + " (id, fname, lname, username, password) VALUES (?, ?, ?, ?, ?)";
-	    return create(insertQuery, user.getId(), user.getFname(), user.getLname(), user.getUsername(), user.getPassword());
+	    String insertQuery = "INSERT INTO " + getTableName() + " (id, fname, lname, username, password, age) VALUES (?, ?, ?, ?, ?, ?)";
+	    return create(insertQuery, user.getId(), user.getFname(), user.getLname(), user.getUsername(), user.getPassword(), user.getAge());
 	}
 	
     public User findByUsername(String username) {
@@ -56,7 +56,7 @@ public class UserDAO extends AbstractDAO<User> {
     }
     
     public boolean updatePassword(String username, String oldPassword, String newPassword) {
-        String query = "UPDATE users SET password = ? WHERE username = ? AND password = ?";
+        String query = "UPDATE user SET password = ? WHERE username = ? AND password = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, newPassword); 

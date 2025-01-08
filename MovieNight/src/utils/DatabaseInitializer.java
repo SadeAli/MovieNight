@@ -16,7 +16,7 @@ public class DatabaseInitializer {
                     lname VARCHAR(50),
                     username VARCHAR(50) UNIQUE,
                     password VARCHAR(50),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP    
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    
                     age INT CHECK (age >= 18)
                 );
 				
@@ -66,8 +66,8 @@ public class DatabaseInitializer {
 					lobby_id INTEGER REFERENCES Lobby(id),
 					suggested_by INTEGER REFERENCES "User"(id),
 					movie_id INTEGER REFERENCES Movie(id),
-					PRIMARY KEY (lobby_id, movie_id)
-					FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE RESTRICT
+					PRIMARY KEY (lobby_id, movie_id),
+					FOREIGN KEY (movie_id) REFERENCES movie(id) ON DELETE RESTRICT
 				);
 				
 				CREATE TABLE IF NOT EXISTS Vote(
