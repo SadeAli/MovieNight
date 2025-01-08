@@ -180,4 +180,8 @@ public interface IDatabase {
 	public void emptyLobby(String ownerUser);
 	
 	public void emptyInvitations(String sender);
+
+	ArrayList<Integer> getMovieIds();
+
+	void removeSuggestion(String ownerUser, int movieId);
 }

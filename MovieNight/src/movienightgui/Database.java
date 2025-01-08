@@ -117,11 +117,22 @@ public class Database implements IDatabase {
 		}
 		return movieTitles;
 	}
+	
+	@Override
+	public ArrayList<Integer> getMovieIds() {
+		ArrayList<Integer> ids = new ArrayList<>();
+		for (Movie movie : movieDAO.findAll()) {
+			ids.add(movie.getId());
+		}
+		return ids;
+	}
 
 	@Override
 	public void suggestMovie(String ownerUser, String user, int movieId) {
+		
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
 		int userId = userDAO.findByUsername(user).getId();
+
 	    // Check if the suggestion already exists
 	    if (!suggestionDAO.suggestionExists(lobbyId, userId, movieId)) {
 	        suggestionDAO.addSuggestion(lobbyId, userId, movieId);
@@ -133,13 +144,15 @@ public class Database implements IDatabase {
 	@Override
 	public ArrayList<String> getSuggestions(String ownerUser) {
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		System.out.println(suggestionDAO.findByLobbyId(lobbyId));
 		ArrayList<String> suggestions = new ArrayList<String>();
 		for (Suggestion suggestion : suggestionDAO.findByLobbyId(lobbyId)) {
 			int movieId = suggestion.getMovieId();
 			int userId = suggestion.getSuggestedBy();
 			String movieTitle = movieDAO.findById(movieId).getTitle();
 			String username = userDAO.findById(userId).getUsername();
-			suggestions.add(movieTitle + " (" + username + ")");
+			suggestions.add(movieTitle + " (" + movieId + ")");
+			System.out.println(movieTitle + " (" + movieId + ")");
 		}
 		return suggestions;
 	}
@@ -211,10 +224,9 @@ public class Database implements IDatabase {
 	}
 
 	@Override
-	public void removeSuggestion(String ownerUser, String user, String movieName) {
+	public void removeSuggestion(String ownerUser, int movieId) {
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
-		int userId = userDAO.findByUsername(user).getId();
-		suggestionDAO.removeSuggestion(lobbyId, userId);		
+		suggestionDAO.removeSuggestion(lobbyId, movieId);
 	}
 
 	@Override
@@ -318,6 +330,12 @@ public class Database implements IDatabase {
 	public void emptyInvitations(String sender) {
 		int ownerId = userDAO.findByUsername(sender).getId();
 		invitationDAO.removeAllInvitations(ownerId);
+	}
+
+	@Override
+	public void removeSuggestion(String ownerUser, String user, String movieName) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	

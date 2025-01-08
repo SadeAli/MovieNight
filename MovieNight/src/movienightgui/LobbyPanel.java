@@ -27,6 +27,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private IDatabase db;
     
     private ArrayList<String> moviesAll = new ArrayList<>();
+    private ArrayList<Integer> movieIds;
     private DefaultListModel<String> movies = new DefaultListModel<>();
     private DefaultListModel<String> lobbyUsers = new DefaultListModel<>();
     private DefaultListModel<String> suggestions = new DefaultListModel<>();
@@ -74,9 +75,10 @@ public class LobbyPanel extends javax.swing.JPanel {
         	readyButton.setEnabled(true);
         }
     }
-    
+
     private void loadMovies() {
         moviesAll = db.getMovies();
+        movieIds = db.getMovieIds();
         movies.removeAllElements();
         movies.addAll(moviesAll);
         moviesList.setModel(movies);
@@ -477,16 +479,18 @@ public class LobbyPanel extends javax.swing.JPanel {
 
     private void suggestButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_suggestButtonActionPerformed
         // TODO add your handling code here:
+        int movieId = movieIds.get(moviesAll.indexOf(selectedMovie));
         if (suggestButton.isSelected()) {
             suggestions.addElement(selectedMovie);
             voteButton.setEnabled(true);
-            db.suggestMovie(ownerUser, selectedMovie);
+            db.suggestMovie(ownerUser, loggedUser, movieId);
         } else {
             suggestions.removeElement(selectedMovie);
             votes.remove(selectedMovie);
             voteButton.setEnabled(false);
-            db.removeSuggestion(ownerUser, selectedMovie);
+            db.removeSuggestion(ownerUser, movieId);
         }
+        System.out.println(suggestions);
     }//GEN-LAST:event_suggestButtonActionPerformed
 
     private void voteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_voteButtonActionPerformed
