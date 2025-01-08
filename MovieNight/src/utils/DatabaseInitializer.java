@@ -9,9 +9,10 @@ public class DatabaseInitializer {
 		
 		try(Statement stmt = connection.createStatement()){
 			
-			String createTables = """
+			String createTables = """							
+				CREATE SEQUENCE user_id_seq START WITH 1 INCREMENT BY 1;
 				CREATE TABLE IF NOT EXISTS "User"(
-                    id SERIAL PRIMARY KEY,
+                    id INT DEFAULT nextval('user_id_seq') PRIMARY KEY,
                     fname VARCHAR(50),
                     lname VARCHAR(50),
                     username VARCHAR(50) UNIQUE,
