@@ -232,5 +232,17 @@ public class DummyDatabase implements IDatabase {
     @Override
     public void suggestMovie(String ownerUser, String user, int movieId) {
 	}
+
+	@Override
+	public HashMap<Integer, Integer> getVotes2(String ownerUser) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void removeSuggestion(String ownerUser, String user, String movieName) {
+		// TODO Auto-generated method stub
+		
+	}
     
 }
