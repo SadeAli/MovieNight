@@ -66,6 +66,7 @@ public class DatabaseInitializer {
 					suggested_by INTEGER REFERENCES "User"(id),
 					movie_id INTEGER REFERENCES Movie(id),
 					PRIMARY KEY (lobby_id, movie_id)
+					FOREIGN KEY (movie_id) REFERENCES movies(id) ON DELETE RESTRICT
 				);
 				
 				CREATE TABLE IF NOT EXISTS Vote(
