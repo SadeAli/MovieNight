@@ -4,6 +4,8 @@ package movienightgui;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import models.Movie;
+
 /**
  * Interface to access to the database. These are the methods that GUI use.
  * @author deneg
@@ -174,4 +176,6 @@ public interface IDatabase {
 	public void removeSuggestion(String ownerUser, String user, String movieName);
 	
 	public boolean updatePassword(String username, String oldPassword, String newPassword);
+	
+	public Movie getMostVotedMovie(String ownerUser);
 }

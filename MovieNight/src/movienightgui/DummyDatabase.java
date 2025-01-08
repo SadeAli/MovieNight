@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import models.Movie;
+
 /**
  *
  * @author deneg
@@ -249,6 +251,12 @@ public class DummyDatabase implements IDatabase {
 	public boolean updatePassword(String username, String oldPassword, String newPassword) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public Movie getMostVotedMovie(String ownerUser) {
+		// TODO Auto-generated method stub
+		return null;
 	}
     
 }
