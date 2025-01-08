@@ -31,8 +31,8 @@ public class UserDAO extends AbstractDAO<User> {
     }
 	
 	public boolean createUser(User user) {
-	    String insertQuery = "INSERT INTO " + getTableName() + " (id, fname, lname, username, password, created_at) VALUES (?, ?, ?, ?, ?, ?)";
-	    return create(insertQuery, user.getId(), user.getFname(), user.getLname(), user.getUsername(), user.getPassword(), user.getCreatedAt());
+	    String insertQuery = "INSERT INTO " + getTableName() + " (id, fname, lname, username, password) VALUES (?, ?, ?, ?, ?)";
+	    return create(insertQuery, user.getId(), user.getFname(), user.getLname(), user.getUsername(), user.getPassword());
 	}
 	
     public User findByUsername(String username) {
