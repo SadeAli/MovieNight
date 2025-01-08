@@ -34,8 +34,11 @@ public class GenreDAO extends AbstractDAO<Genre> {
 	public Genre getGenre(String name) {
 		String query = "SELECT * FROM " + getTableName() + " WHERE name = ?";
         try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
+            stmt.setString(1, name);
 			ResultSet rs = stmt.executeQuery();
-			return mapResultSetToEntity(rs);
+            if (rs.next()) {
+                return mapResultSetToEntity(rs);
+            }
 		} catch (SQLException e) {
             System.err.println("FindAll error: " + e.getMessage());
         }

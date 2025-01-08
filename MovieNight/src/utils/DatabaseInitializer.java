@@ -16,6 +16,7 @@ import models.Movie;
 import models.User;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
 
 public class DatabaseInitializer {
 	public static void initialize(Connection connection) {
@@ -132,10 +133,10 @@ public class DatabaseInitializer {
 				new User(7, "ata", "budak", "abu", "123456", creationDate),
 				new User(8, "buse", "deniz", "bubu", "123456", creationDate),
 				new User(9, "ayşe", "kaya", "aykaya", "123456", creationDate),
-				new User(10, "u", "0", "test0", "123456", creationDate),
-				new User(11, "u", "1", "test1", "123456", creationDate),
-				new User(12, "u", "2", "test2", "123456", creationDate),
-				new User(12, "u", "3", "test3", "123456", creationDate),
+				new User(10, "u0", "0", "test0", "123456", creationDate),
+				new User(11, "u1", "1", "test1", "123456", creationDate),
+				new User(12, "u2", "2", "test2", "123456", creationDate),
+				new User(13, "u3", "3", "test3", "123456", creationDate),
 		};
 
 		UserDAO userDAO = new UserDAO(connection);
@@ -259,5 +260,18 @@ public class DatabaseInitializer {
 
 		// reservoir dogs : crime
 		hasGenreDAO.assignGenreToMovie(movies[9], genreDAO.getGenre("crime"));
+	}
+	
+	public static void main(String[] args) {
+		
+		try {
+			Connection connection = DatabaseConnection.connect();
+			System.out.println("Reseting DB...");
+			reset(connection);
+			System.out.println("Create test defaults...");
+			createDefaults(connection);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }
