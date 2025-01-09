@@ -192,4 +192,8 @@ public interface IDatabase {
 	ArrayList<Integer> getSuggestedMovieIds(String ownerUser);
 
 	ArrayList<String> getSuggestionTitles(String ownerUser);
+
+	void voteMovie(String user, String ownerUser, int movieId);
+
+	void removeVote(String user, String ownerUser, int movieId);
 }

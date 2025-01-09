@@ -44,5 +44,16 @@ public class VoteDAO extends AbstractDAO<Vote> {
         }
         return results;
     }
+    
+	public boolean addVote(int lobbyId, int userId, int movieId) {
+	    String insertQuery = "INSERT INTO " + getTableName() + " (lobby_id, user_id, movie_id) VALUES (?, ?, ?)";
+	    return create(insertQuery, lobbyId, userId, movieId);
+	    // TODO: Do not insert if suggestion already exists.
+	}
 
+	public boolean removeVote(int lobbyId, int userId, int movieId) {
+	    String insertQuery = "DELETE FROM " + getTableName() + " WHERE lobby_id = ? and user_id = ? and movie_id = ?";
+	    return delete(insertQuery, lobbyId, userId, movieId);
+	    // TODO: Do not insert if suggestion already exists.
+	}
 }

@@ -300,5 +300,17 @@ public class DummyDatabase implements IDatabase {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void voteMovie(String user, String ownerUser, int movieId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removeVote(String user, String ownerUser, int movieId) {
+		// TODO Auto-generated method stub
+		
+	}
     
 }

@@ -164,7 +164,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     
     private Integer findIdOfSelectedMovie() {
     	for (int movieId : movies.keySet()) {
-    		if (movies.get(movieId).equals(selectedMovie)) {
+    		if (selectedMovie.contains(movies.get(movieId))) {
     			return movieId;
     		}
     	}
@@ -518,9 +518,11 @@ public class LobbyPanel extends javax.swing.JPanel {
         if (voteButton.isSelected()) {
             votes.add(selectedMovie);
             suggestButton.setEnabled(false);
+            db.voteMovie(loggedUser, ownerUser, findIdOfSelectedMovie());
         } else {
             votes.remove(selectedMovie);
             suggestButton.setEnabled(true);
+            db.removeVote(loggedUser, ownerUser, findIdOfSelectedMovie());
         }
         System.out.println(votes);
     }//GEN-LAST:event_voteButtonActionPerformed

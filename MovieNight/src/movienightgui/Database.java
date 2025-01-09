@@ -372,4 +372,18 @@ public class Database implements IDatabase {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public void voteMovie(String user, String ownerUser, int movieId) {
+		voteDAO.addVote(
+				userDAO.findByUsername(user).getId(), 
+				userDAO.findByUsername(user).getId(), movieId);
+	}
+	
+	@Override
+	public void removeVote(String user, String ownerUser, int movieId) {
+		voteDAO.removeVote(
+				userDAO.findByUsername(user).getId(), 
+				userDAO.findByUsername(user).getId(), movieId);
+	}
 }
