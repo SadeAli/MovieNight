@@ -119,6 +119,12 @@ public class Database implements IDatabase {
 	}
 	
 	@Override
+	public String getMovieTitle(int movieId) {
+		Movie movie = movieDAO.findById(movieId);
+		return movie.getTitle() + " (" + movie.getId() + ")";
+	}
+	
+	@Override
 	public ArrayList<Integer> getMovieIds() {
 		ArrayList<Integer> ids = new ArrayList<>();
 		for (Movie movie : movieDAO.findAll()) {
@@ -385,5 +391,21 @@ public class Database implements IDatabase {
 		voteDAO.removeVote(
 				userDAO.findByUsername(user).getId(), 
 				userDAO.findByUsername(user).getId(), movieId);
+	}
+	
+	@Override
+	public void emptySuggestions(String ownerUser) {
+		suggestionDAO.removeAllSuggestions(userDAO.findByUsername(ownerUser).getId());
+	}
+
+	@Override
+	public void emptySuggestions(int lobbyId) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void emptyVotes(String ownerUser) {
+		voteDAO.removeAllVotes(userDAO.findByUsername(ownerUser).getId());
 	}
 }

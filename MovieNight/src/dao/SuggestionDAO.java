@@ -72,4 +72,9 @@ public class SuggestionDAO extends AbstractDAO<Suggestion> {
         }
         return false;
     }
+    
+	public boolean removeAllSuggestions(int lobbyId) {
+	    String insertQuery = "DELETE FROM " + getTableName() + " where lobby_id = ?";
+	    return delete(insertQuery, lobbyId);
+	}
 }

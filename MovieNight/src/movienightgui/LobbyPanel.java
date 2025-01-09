@@ -32,8 +32,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private String loggedUser;
     private IDatabase db;
     
-    private HashMap<Integer, String> movies;
-    private ArrayList<Integer> suggestedMovieIds;
+    private HashMap<Integer, String> movies = new HashMap<>();
     private DefaultListModel<String> moviesModel = new DefaultListModel<>();
     private DefaultListModel<String> lobbyUsers = new DefaultListModel<>();
     private DefaultListModel<String> suggestionsModel = new DefaultListModel<>();
@@ -46,7 +45,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private final JFrame parentFrame;
         
     private final int DELAY = 500;
-    private final int READYWAITSECONDS = 10;
+    private final int READYWAITSECONDS = 1;
     private int readyWaitCounter = 0;
     private Timer timer;
     
@@ -69,10 +68,10 @@ public class LobbyPanel extends javax.swing.JPanel {
         this.loggedUser = sharedUserModel.getUsername();
         this.ownerUser = db.getBelongingLobbyOwner(loggedUser);
         
+        initSearch();
         loadMovies();
         loadLobbyUsers();
         loadSuggestions();
-        initSearch();
         initDatabaseAccessTimer();
         voteStatusLabel.setText("User \"" + loggedUser + "\" is voting...");
         this.parentFrame.pack();

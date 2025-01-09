@@ -42,13 +42,13 @@ public class ResultPanel extends javax.swing.JPanel {
         for (int i = 0; i < lobbyResults.size(); i++) {
             model.addElement(
                     String.format("%d - %s (%d)", i+1, 
-                    lobbyResults.get(i), 
+                    db.getMovieTitle(lobbyResults.get(i)), 
                     lobbyVotes.get(lobbyResults.get(i))
             ));
         }
         
         if (lobbyResults.size() > 0) {
-            jLabel1.setText("Movie: " + lobbyResults.getFirst());
+            jLabel1.setText("Movie: " + db.getMovieTitle(lobbyResults.getFirst()));
         }
         
         String username = sharedUserModel.getUsername();
@@ -56,7 +56,9 @@ public class ResultPanel extends javax.swing.JPanel {
         if (username != null && username.equals(ownerUser)) {
         	db.emptyLobby(ownerUser);
         	db.emptyInvitations(ownerUser);
-        	db.deleteLobby(sharedUserModel.getLobby());
+        	db.emptySuggestions(ownerUser);
+        	db.emptyVotes(ownerUser);
+        	db.deleteLobby(ownerUser);
         } 
     }
 

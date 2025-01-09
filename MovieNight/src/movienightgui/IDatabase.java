@@ -196,4 +196,12 @@ public interface IDatabase {
 	void voteMovie(String user, String ownerUser, int movieId);
 
 	void removeVote(String user, String ownerUser, int movieId);
+
+	String getMovieTitle(int movieId);
+
+	void emptySuggestions(int lobbyId);
+
+	void emptySuggestions(String ownerUser);
+
+	void emptyVotes(String ownerUser);
 }
