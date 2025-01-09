@@ -382,14 +382,14 @@ public class Database implements IDatabase {
 	@Override
 	public void voteMovie(String user, String ownerUser, int movieId) {
 		voteDAO.addVote(
-				userDAO.findByUsername(user).getId(), 
+				userDAO.findByUsername(ownerUser).getId(), 
 				userDAO.findByUsername(user).getId(), movieId);
 	}
 	
 	@Override
 	public void removeVote(String user, String ownerUser, int movieId) {
 		voteDAO.removeVote(
-				userDAO.findByUsername(user).getId(), 
+				userDAO.findByUsername(ownerUser).getId(), 
 				userDAO.findByUsername(user).getId(), movieId);
 	}
 	
