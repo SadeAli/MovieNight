@@ -110,7 +110,7 @@ public class Database implements IDatabase {
 	}
 
 	@Override
-	public ArrayList<String> getMovies() {
+	public ArrayList<String> getMovieTitles() {
 		ArrayList<String> movieTitles = new ArrayList<String>();
 		for (Movie movie : movieDAO.findAll()) {
 			movieTitles.add(movie.getTitle() + " (" + movie.getId() + ")");
@@ -338,5 +338,38 @@ public class Database implements IDatabase {
 		
 	}
 	
+	@Override
+	public ArrayList<Integer> getSuggestedMovieIds(String ownerUser) {
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		ArrayList<Integer> suggestions = new ArrayList<>();
+		for (Suggestion s : suggestionDAO.findByLobbyId(lobbyId)) {
+			suggestions.add(s.getMovieId());
+		}
+		return suggestions;
+	}
 	
+	@Override
+	public String getSuggestionTitle(String ownerUser, int movieId, String suggestedBy) {
+		int voteCount = getVotes2(ownerUser).get(movieId);
+		Movie m = movieDAO.findById(movieId);
+		return String.format("%s (%d) (s: %s) %d", 
+				m.getTitle(), m.getId(), suggestedBy, voteCount);
+	}
+	
+	@Override
+	public ArrayList<String> getSuggestionTitles(String ownerUser) {
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		ArrayList<String> suggestionTitles = new ArrayList<>();
+		for (Suggestion s : suggestionDAO.findByLobbyId(lobbyId)) {
+			String suggestedBy = userDAO.findById(s.getSuggestedBy()).getUsername();
+			suggestionTitles.add(getSuggestionTitle(ownerUser, s.getMovieId(), suggestedBy));
+		}
+		return suggestionTitles;
+	}
+
+	@Override
+	public ArrayList<String> getMovies() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

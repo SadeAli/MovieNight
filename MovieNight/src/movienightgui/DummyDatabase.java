@@ -264,5 +264,41 @@ public class DummyDatabase implements IDatabase {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public ArrayList<Integer> getMovieIds() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void removeSuggestion(String ownerUser, int movieId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ArrayList<String> getMovieTitles() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getSuggestionTitle(String ownerUser, int movieId, String suggestedBy) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<Integer> getSuggestedMovieIds(String ownerUser) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<String> getSuggestionTitles(String ownerUser) {
+		// TODO Auto-generated method stub
+		return null;
+	}
     
 }

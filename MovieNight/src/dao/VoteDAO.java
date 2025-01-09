@@ -34,7 +34,7 @@ public class VoteDAO extends AbstractDAO<Vote> {
         List<Vote> results = new ArrayList<>();
         try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
             stmt.setInt(1, lobbyId);
-            stmt.setInt(1, userId);
+            stmt.setInt(2, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 results.add(mapResultSetToEntity(rs));
