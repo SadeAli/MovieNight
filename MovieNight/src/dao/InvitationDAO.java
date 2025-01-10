@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import models.Invitation;
-import models.Lobby;
-import models.Lobby;
-import models.User;
 
 public class InvitationDAO extends AbstractDAO<Invitation> {
 	public InvitationDAO(Connection connection) {
@@ -27,7 +24,7 @@ public class InvitationDAO extends AbstractDAO<Invitation> {
 		return new Invitation(
 				rs.getInt("sender_id"),
 				rs.getInt("lobby_id"),
-				rs.getInt("receiver_id")
+				rs.getInt("receviver_id")
 		);
 	}
 	
@@ -39,11 +36,6 @@ public class InvitationDAO extends AbstractDAO<Invitation> {
 	public boolean deleteInvitation(int senderId, int receiverId) {
 	    String deleteQuery = "DELETE FROM " + getTableName() + " WHERE sender_id = ? AND receiver_id = ?";
 	    return delete(deleteQuery, senderId, receiverId);
-	}
-	
-	public boolean removeAllInvitations(int senderId) {
-	    String insertQuery = "DELETE FROM " + getTableName() + " where sender_id = ?";
-	    return delete(insertQuery, senderId);
 	}
 	
     public List<Invitation> findByReceiver(int receiverId) {
@@ -60,23 +52,4 @@ public class InvitationDAO extends AbstractDAO<Invitation> {
         }
         return results;
     }
-    
-    public List<Invitation> findBySender(int senderId) {
-    	String query = "SELECT * FROM " + getTableName() + " WHERE sender_id = ?";
-        List<Invitation> results = new ArrayList<>();
-        try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
-        	stmt.setInt(1, senderId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                results.add(mapResultSetToEntity(rs));
-            }
-        } catch (SQLException e) {
-            System.err.println("FindAll error: " + e.getMessage());
-        }
-        return results;
-    }
-	public boolean sendInvitation(User sender, Lobby lobby, User receiver) {
-		String insertQuery = "INSERT INTO " + getTableName() + " (sender_id, lobby_id, receiver_id) VALUES (?, ?, ?)";
-	    return create(insertQuery, sender.getId(), lobby.getId(), receiver.getId());
-	}
 }

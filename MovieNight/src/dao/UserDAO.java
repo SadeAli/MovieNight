@@ -26,13 +26,14 @@ public class UserDAO extends AbstractDAO<User> {
                 rs.getString("lname"),
                 rs.getString("username"),
                 rs.getString("password"),
-                rs.getString("created_at")
+                rs.getString("created_at"),
+                rs.getInt("age")
         );
     }
 	
 	public boolean createUser(User user) {
-	    String insertQuery = "INSERT INTO " + getTableName() + " (id, fname, lname, username, password) VALUES (?, ?, ?, ?, ?)";
-	    return create(insertQuery, user.getId(), user.getFname(), user.getLname(), user.getUsername(), user.getPassword());
+	    String insertQuery = "INSERT INTO " + getTableName() + " (id, fname, lname, username, password, age) VALUES (?, ?, ?, ?, ?, ?)";
+	    return create(insertQuery, user.getId(), user.getFname(), user.getLname(), user.getUsername(), user.getPassword(), user.getAge());
 	}
 	
     public User findByUsername(String username) {
@@ -52,5 +53,21 @@ public class UserDAO extends AbstractDAO<User> {
     public boolean updateUserDetails(int userId, String fname, String lname) {
         String updateQuery = "UPDATE " + getTableName() + " SET fname = ?, lname = ? WHERE id = ?";
         return update(updateQuery, fname, lname, userId);
+    }
+    
+    public boolean updatePassword(String username, String oldPassword, String newPassword) {
+        String query = "UPDATE user SET password = ? WHERE username = ? AND password = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, newPassword); 
+            stmt.setString(2, username);    
+            stmt.setString(3, oldPassword); 
+
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating password: " + e.getMessage());
+            return false;
+        }
     }
 }

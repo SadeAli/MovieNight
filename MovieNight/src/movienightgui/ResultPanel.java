@@ -17,7 +17,7 @@ public class ResultPanel extends javax.swing.JPanel {
 
     private final IDatabase db;
     private final SharedUserModel sharedUserModel;
-    private HashMap<Integer, Integer> lobbyVotes;
+    private HashMap<String, Integer> lobbyVotes;
 
     /**
      * Creates new form ResultPanel
@@ -31,8 +31,8 @@ public class ResultPanel extends javax.swing.JPanel {
     }
     
     public void init() {
-        lobbyVotes = db.getVotes2(sharedUserModel.getLobby());
-        ArrayList<Integer> lobbyResults = new ArrayList<>(lobbyVotes.keySet());
+        lobbyVotes = db.getVotes(sharedUserModel.getLobby());
+        ArrayList<String> lobbyResults = new ArrayList<>(lobbyVotes.keySet());
         lobbyResults.sort(
                 ((m1, m2) -> Integer.compare(lobbyVotes.get(m2), lobbyVotes.get(m1)))
         );
@@ -42,24 +42,20 @@ public class ResultPanel extends javax.swing.JPanel {
         for (int i = 0; i < lobbyResults.size(); i++) {
             model.addElement(
                     String.format("%d - %s (%d)", i+1, 
-                    db.getMovieTitle(lobbyResults.get(i)), 
+                    lobbyResults.get(i), 
                     lobbyVotes.get(lobbyResults.get(i))
             ));
         }
         
         if (lobbyResults.size() > 0) {
-            jLabel1.setText("Movie: " + db.getMovieTitle(lobbyResults.getFirst()));
+            jLabel1.setText("Movie: " + lobbyResults.getFirst());
         }
+       
+    }
+    
+    private void deleteLobby() {
+        db.deleteLobby(sharedUserModel.getLobby());
         
-        String username = sharedUserModel.getUsername();
-        String ownerUser = db.getBelongingLobbyOwner(username);
-        if (username != null && ownerUser != null && username.equals(ownerUser)) {
-        	db.emptyLobby(ownerUser);
-        	db.emptyInvitations(ownerUser);
-        	db.emptySuggestions(ownerUser);
-        	db.emptyVotes(ownerUser);
-        	db.deleteLobby(ownerUser);
-        } 
     }
 
     /**

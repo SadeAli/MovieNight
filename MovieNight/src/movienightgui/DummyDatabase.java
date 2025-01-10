@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import models.Movie;
+
 /**
  *
  * @author deneg
@@ -47,6 +49,10 @@ public class DummyDatabase implements IDatabase {
             createLobby(users.get(i));
             invitationsAll.put(users.get(i), invitationsForUser);
         }   
+    }
+    
+    public void x() {
+        
     }
     
     @Override
@@ -242,99 +248,15 @@ public class DummyDatabase implements IDatabase {
 	}
 
 	@Override
-	public ArrayList<String> getInvitationsOfUser(String username) {
+	public boolean updatePassword(String username, String oldPassword, String newPassword) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Movie getMostVotedMovie(String ownerUser) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void setLobbyReady(String ownerUser) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void emptyLobby(String ownerUser) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void emptyInvitations(String sender) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public ArrayList<Integer> getMovieIds() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void removeSuggestion(String ownerUser, int movieId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public ArrayList<String> getMovieTitles() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getSuggestionTitle(String ownerUser, int movieId, String suggestedBy) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<Integer> getSuggestedMovieIds(String ownerUser) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ArrayList<String> getSuggestionTitles(String ownerUser) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void voteMovie(String user, String ownerUser, int movieId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removeVote(String user, String ownerUser, int movieId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public String getMovieTitle(int movieId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void emptySuggestions(int lobbyId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void emptySuggestions(String ownerUser) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void emptyVotes(String ownerUser) {
-		// TODO Auto-generated method stub
-		
 	}
     
 }

@@ -10,12 +10,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.Timer;
@@ -32,10 +26,10 @@ public class LobbyPanel extends javax.swing.JPanel {
     private String loggedUser;
     private IDatabase db;
     
-    private HashMap<Integer, String> movies = new HashMap<>();
-    private DefaultListModel<String> moviesModel = new DefaultListModel<>();
+    private ArrayList<String> moviesAll = new ArrayList<>();
+    private DefaultListModel<String> movies = new DefaultListModel<>();
     private DefaultListModel<String> lobbyUsers = new DefaultListModel<>();
-    private DefaultListModel<String> suggestionsModel = new DefaultListModel<>();
+    private DefaultListModel<String> suggestions = new DefaultListModel<>();
     
     private String selectedMovie;
     private Boolean searchEmpty = true;
@@ -43,11 +37,12 @@ public class LobbyPanel extends javax.swing.JPanel {
     private ArrayList<String> votes = new ArrayList<>();
     private final SharedUserModel sharedUserModel;
     private final JFrame parentFrame;
-        
+    
+    private boolean isReady = false;
+    
     private final int DELAY = 500;
-    private final int READYWAITSECONDS = 1;
+    private final int READYWAITSECONDS = 10;
     private int readyWaitCounter = 0;
-    private Timer timer;
     
     /**
      * Creates new form LobbyPanel
@@ -56,18 +51,12 @@ public class LobbyPanel extends javax.swing.JPanel {
         initComponents();
         this.db = db;
         this.sharedUserModel = sharedUserModel;
-        this.parentFrame = parentFrame;        
+        this.parentFrame = parentFrame;
     }
     
-    private static <K, V> Map<K, V> zipToMap(List<K> keys, List<V> values) {
-        return IntStream.range(0, keys.size()).boxed()
-                .collect(Collectors.toMap(keys::get, values::get));
-    }
-
     public void init() {
+        this.ownerUser = sharedUserModel.getLobby();
         this.loggedUser = sharedUserModel.getUsername();
-        this.ownerUser = db.getBelongingLobbyOwner(loggedUser);
-        
         initSearch();
         loadMovies();
         loadLobbyUsers();
@@ -75,21 +64,13 @@ public class LobbyPanel extends javax.swing.JPanel {
         initDatabaseAccessTimer();
         voteStatusLabel.setText("User \"" + loggedUser + "\" is voting...");
         this.parentFrame.pack();
-        
-        String username = sharedUserModel.getUsername();
-        this.ownerUser = db.getBelongingLobbyOwner(username);
-        if (!username.equals(ownerUser)) {
-        	readyButton.setEnabled(false);
-        } else {
-        	readyButton.setEnabled(true);
-        }
     }
-
+    
     private void loadMovies() {
-        movies = (HashMap<Integer, String>) zipToMap(db.getMovieIds(), db.getMovieTitles());
-        moviesModel.removeAllElements();
-        moviesModel.addAll(movies.values());
-        moviesList.setModel(moviesModel);
+        moviesAll = db.getMovies();
+        movies.removeAllElements();
+        movies.addAll(moviesAll);
+        moviesList.setModel(movies);
     }
     
     private void loadLobbyUsers() {
@@ -99,16 +80,16 @@ public class LobbyPanel extends javax.swing.JPanel {
     }
     
     private void loadSuggestions() {
-        suggestionsModel.removeAllElements();
-        suggestionsModel.addAll(db.getSuggestionTitles(ownerUser));
-        suggestionsList.setModel(suggestionsModel);
+        suggestions.removeAllElements();
+        suggestions.addAll(db.getSuggestions(ownerUser));
+        suggestionsList.setModel(suggestions);
     }
     
     private void showSelectedMovieInfo() {
         // Pull info, show info...
         movieName.setText(selectedMovie);
         
-        if (suggestionsModel.contains(selectedMovie)) {
+        if (suggestions.contains(selectedMovie)) {
             voteButton.setEnabled(true);
             if (votes.contains(selectedMovie)) {
                 voteButton.setSelected(true);
@@ -128,14 +109,11 @@ public class LobbyPanel extends javax.swing.JPanel {
     }
     
     private void search(String input) {
-        moviesModel.removeAllElements();
-        moviesModel.addAll(movies.values());
-        for (Integer movieId : movies.keySet()) {
-        	// check genre, actor etc. too!
-        	// then remove them.
-        	String title = movies.get(movieId);
-            if (!title.contains(input)) {
-                moviesModel.removeElement(title);
+        movies.removeAllElements();
+        movies.addAll(moviesAll);
+        for (String m : moviesAll) {
+            if (!m.contains(input)) {
+                movies.removeElement(m);
             }
         }
     }
@@ -161,15 +139,6 @@ public class LobbyPanel extends javax.swing.JPanel {
         moviesList.requestFocus();  // To prevent search field to focus with placeholder.
     }
     
-    private Integer findIdOfSelectedMovie() {
-    	for (int movieId : movies.keySet()) {
-    		if (selectedMovie.contains(movies.get(movieId))) {
-    			return movieId;
-    		}
-    	}
-    	return null;
-    }
-    
     private void refreshSearch() {
         searchEmpty = true;
         searchMovieField.setText("Search movie...");
@@ -180,6 +149,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         ActionListener listener = (ActionEvent e) -> {
             int userSelectedIndex = usersInLobbyList.getSelectedIndex();
             
+            System.out.println("Load from DB!");
             loadLobbyUsers();
             loadSuggestions();
             
@@ -193,12 +163,16 @@ public class LobbyPanel extends javax.swing.JPanel {
                     readyWaitCounter += 1;
                 } else {
                     showResults();
-                    timer.stop();
                 }
-            } 
+            } else if (isReady) {
+                voteStatusLabel.setText(String.format(
+                        "Waiting %d/%d users to be ready...",
+                        db.getLobbyReadyCount(ownerUser),
+                        db.getUsersAtLobby(ownerUser).size()
+                ));
+            }
         };
-        this.timer = new Timer(DELAY, listener);
-        this.timer.start();
+        new Timer(DELAY, listener).start();
     }
     
     private void showResults() {
@@ -489,27 +463,31 @@ public class LobbyPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_suggestionsListMouseClicked
 
     private void readyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readyButtonActionPerformed
+        // TODO add your handling code here:
+        readyButton.setEnabled(false);
+        suggestButton.setEnabled(false);
+        voteButton.setEnabled(false);
+        moviesList.setEnabled(false);
+        suggestionsList.setEnabled(false);
+        searchMovieField.setEnabled(false);
         System.out.println("User ready!");
         System.out.println(votes);
-        db.setLobbyReady(ownerUser);
-        readyButton.setEnabled(false);
-        System.out.println("ready then?");
+        isReady = true;
+        db.updateVotesUserReady(ownerUser, votes);
     }//GEN-LAST:event_readyButtonActionPerformed
 
     private void suggestButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_suggestButtonActionPerformed
         // TODO add your handling code here:
-        int movieId = findIdOfSelectedMovie();
         if (suggestButton.isSelected()) {
-            suggestionsModel.addElement(selectedMovie);
+            suggestions.addElement(selectedMovie);
             voteButton.setEnabled(true);
-            db.suggestMovie(ownerUser, loggedUser, movieId);
+            db.suggestMovie(ownerUser, selectedMovie);
         } else {
-            suggestionsModel.removeElement(selectedMovie);
+            suggestions.removeElement(selectedMovie);
             votes.remove(selectedMovie);
             voteButton.setEnabled(false);
-            db.removeSuggestion(ownerUser, movieId);
+            db.removeSuggestion(ownerUser, selectedMovie);
         }
-        System.out.println(suggestionsModel);
     }//GEN-LAST:event_suggestButtonActionPerformed
 
     private void voteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_voteButtonActionPerformed
@@ -517,11 +495,9 @@ public class LobbyPanel extends javax.swing.JPanel {
         if (voteButton.isSelected()) {
             votes.add(selectedMovie);
             suggestButton.setEnabled(false);
-            db.voteMovie(loggedUser, ownerUser, findIdOfSelectedMovie());
         } else {
             votes.remove(selectedMovie);
             suggestButton.setEnabled(true);
-            db.removeVote(loggedUser, ownerUser, findIdOfSelectedMovie());
         }
         System.out.println(votes);
     }//GEN-LAST:event_voteButtonActionPerformed
