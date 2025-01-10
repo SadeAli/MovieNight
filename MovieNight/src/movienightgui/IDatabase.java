@@ -4,8 +4,6 @@ package movienightgui;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import models.Movie;
-
 /**
  * Interface to access to the database. These are the methods that GUI use.
  * @author deneg
@@ -173,9 +171,37 @@ public interface IDatabase {
     
     public HashMap<Integer, Integer> getVotes2(String ownerUser);
 
-	public void removeSuggestion(String ownerUser, String user, String movieName);
+	public ArrayList<String> getInvitationsOfUser(String username);
+    
+    public void removeSuggestion(String ownerUser, String user, String movieName);
+
+    public void setLobbyReady(String ownerUser);
+
+	public void emptyLobby(String ownerUser);
 	
-	public boolean updatePassword(String username, String oldPassword, String newPassword);
-	
-	public Movie getMostVotedMovie(String ownerUser);
+	public void emptyInvitations(String sender);
+
+	ArrayList<Integer> getMovieIds();
+
+	void removeSuggestion(String ownerUser, int movieId);
+
+	ArrayList<String> getMovieTitles();
+
+	String getSuggestionTitle(String ownerUser, int movieId, String suggestedBy);
+
+	ArrayList<Integer> getSuggestedMovieIds(String ownerUser);
+
+	ArrayList<String> getSuggestionTitles(String ownerUser);
+
+	void voteMovie(String user, String ownerUser, int movieId);
+
+	void removeVote(String user, String ownerUser, int movieId);
+
+	String getMovieTitle(int movieId);
+
+	void emptySuggestions(int lobbyId);
+
+	void emptySuggestions(String ownerUser);
+
+	void emptyVotes(String ownerUser);
 }

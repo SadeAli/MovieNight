@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.Movie;
 import models.Suggestion;
 import models.Vote;
 
@@ -35,7 +34,7 @@ public class VoteDAO extends AbstractDAO<Vote> {
         List<Vote> results = new ArrayList<>();
         try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
             stmt.setInt(1, lobbyId);
-            stmt.setInt(1, userId);
+            stmt.setInt(2, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 results.add(mapResultSetToEntity(rs));
@@ -46,33 +45,20 @@ public class VoteDAO extends AbstractDAO<Vote> {
         return results;
     }
     
-    public int getMostVotedMovieIdInLobby(int lobbyId) {
-        String query = """
-            SELECT movie_id, COUNT(*) AS vote_count
-            FROM votes
-            WHERE lobby_id = ?
-            GROUP BY movie_id
-            HAVING COUNT(*) = (
-                SELECT MAX(vote_count) 
-                FROM (
-                    SELECT COUNT(*) AS vote_count 
-                    FROM votes
-                    WHERE lobby_id = ?
-                    GROUP BY movie_id
-                ) AS vote_counts
-            );
-        """;
+	public boolean addVote(int lobbyId, int userId, int movieId) {
+	    String insertQuery = "INSERT INTO " + getTableName() + " (lobby_id, user_id, movie_id) VALUES (?, ?, ?)";
+	    return create(insertQuery, lobbyId, userId, movieId);
+	    // TODO: Do not insert if suggestion already exists.
+	}
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setInt(1, lobbyId);  
-            stmt.setInt(2, lobbyId); 
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("movie_id");
-            }
-        } catch (SQLException e) {
-            System.err.println("Error fetching most voted movie ID in lobby: " + e.getMessage());
-        }
-        return -1;
-    }
+	public boolean removeVote(int lobbyId, int userId, int movieId) {
+	    String insertQuery = "DELETE FROM " + getTableName() + " WHERE lobby_id = ? and user_id = ? and movie_id = ?";
+	    return delete(insertQuery, lobbyId, userId, movieId);
+	    // TODO: Do not insert if suggestion already exists.
+	}
+	
+	public boolean removeAllVotes(int lobbyId) {
+	    String insertQuery = "DELETE FROM " + getTableName() + " where lobby_id = ?";
+	    return delete(insertQuery, lobbyId);
+	}
 }
