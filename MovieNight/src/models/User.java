@@ -7,9 +7,8 @@ public class User {
 	private String username;
 	private String password;
 	private String createdAt;
-	private int age;
 
-	public User(int id, String fname, String lname, String username, String password, String createdAt, int age)
+	public User(int id, String fname, String lname, String username, String password, String createdAt)
 	{
 		this.id = id;
 		this.fname = fname;
@@ -17,7 +16,6 @@ public class User {
 		this.username = username;
 		this.password = password;
 		this.createdAt = createdAt;
-		this.age = age;
 	}
 
 	public int getId() {
@@ -67,14 +65,5 @@ public class User {
 	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
 	}
-
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
-	}
-	
 	
 }

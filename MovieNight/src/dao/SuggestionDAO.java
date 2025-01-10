@@ -47,7 +47,7 @@ public class SuggestionDAO extends AbstractDAO<Suggestion> {
         try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
             stmt.setInt(1, lobbyId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 results.add(mapResultSetToEntity(rs));
             }
         } catch (SQLException e) {
@@ -57,7 +57,7 @@ public class SuggestionDAO extends AbstractDAO<Suggestion> {
     }
     
     public boolean suggestionExists(int lobbyId, int userId, int movieId) {
-        String query = "SELECT COUNT(*) FROM suggestion WHERE lobbyId = ? AND suggestedBy = ? AND movieId = ?";
+        String query = "SELECT COUNT(*) FROM suggestion WHERE lobby_id = ? AND suggested_by = ? AND movie_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, lobbyId);
             stmt.setInt(2, userId);
@@ -72,4 +72,9 @@ public class SuggestionDAO extends AbstractDAO<Suggestion> {
         }
         return false;
     }
+    
+	public boolean removeAllSuggestions(int lobbyId) {
+	    String insertQuery = "DELETE FROM " + getTableName() + " where lobby_id = ?";
+	    return delete(insertQuery, lobbyId);
+	}
 }

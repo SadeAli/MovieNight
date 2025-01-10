@@ -22,12 +22,13 @@ public class LobbyDAO extends AbstractDAO<Lobby> {
 		return new Lobby(
 				rs.getInt("id"),
 				rs.getInt("owner_id"),
+				rs.getBoolean("is_ready"),
 				rs.getDate("date")
 		);
 	}
 	
 	public boolean createLobby(int lobbyId, int ownerId) {
-	    String insertQuery = "INSERT INTO " + getTableName() + " (lobby_id, owner_id, date) VALUES (?, ?, 0)";
+	    String insertQuery = "INSERT INTO " + getTableName() + " (id, owner_id, is_ready, date) VALUES (?, ?, FALSE, now())";
 	    return create(insertQuery, lobbyId, ownerId);
 	}
 	
@@ -49,5 +50,15 @@ public class LobbyDAO extends AbstractDAO<Lobby> {
 	        System.err.println("Error checking lobby existence: " + e.getMessage());
 	    }
 	    return false;
+	}
+	
+	public boolean setLobbyReady(int lobbyId) {
+		String updateQuery = "UPDATE " + getTableName() + " SET is_ready = TRUE WHERE id = ?";
+		return update(updateQuery, lobbyId);
+	}
+
+	public boolean createLobby(Lobby lobby) {
+		String insertQuery = "INSERT INTO " + getTableName() + " (id, owner_id, date) VALUES (?, ?, ?)";
+	    return create(insertQuery, lobby.getId(), lobby.getOwnerId(), lobby.getDate());
 	}
 }
