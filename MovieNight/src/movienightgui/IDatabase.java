@@ -204,4 +204,10 @@ public interface IDatabase {
 	void emptySuggestions(String ownerUser);
 
 	void emptyVotes(String ownerUser);
+
+	String getSuggestedByUsername(int suggestedMovieId, String ownerUser);
+
+	void removeVotesForMovie(String ownerUser, int movieId);
+
+	ArrayList<Integer> getVoteMovieIdsOfUser(String ownerUser, String username);
 }

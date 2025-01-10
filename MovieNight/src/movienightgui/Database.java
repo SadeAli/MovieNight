@@ -30,6 +30,23 @@ public class Database implements IDatabase {
 	}
 	
 	@Override
+	public void removeVotesForMovie(String ownerUser, int movieId) {
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		voteDAO.removeVotesOfMovie(lobbyId, movieId);
+	}
+	
+	@Override
+	public String getSuggestedByUsername(int suggestedMovieId, String ownerUser) {
+		ArrayList<Suggestion> suggestions = (ArrayList<Suggestion>) suggestionDAO.findByLobbyId(userDAO.findByUsername(ownerUser).getId());
+		for (Suggestion s : suggestions) {
+			if (s.getMovieId() == suggestedMovieId) {
+				return userDAO.findById(s.getSuggestedBy()).getUsername();
+			}
+		}
+		return null;
+	}
+	
+	@Override
 	public boolean validateLogin(String username, String password) {
 		User user = userDAO.findByUsername(username);
 		if (user instanceof User && user.getPassword().equals(password)) {
@@ -189,6 +206,18 @@ public class Database implements IDatabase {
 			}
 		}
 		return votes;
+	}
+	
+	@Override
+	public ArrayList<Integer> getVoteMovieIdsOfUser(String ownerUser, String username) {
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		int userId = userDAO.findByUsername(username).getId();
+		
+		ArrayList<Integer> votedMovieIds = new ArrayList<Integer>();
+		for (Vote v : voteDAO.findVotesOfUser(lobbyId, userId)) {
+			votedMovieIds.add(v.getMovieId());
+		}
+		return votedMovieIds;
 	}
 
 	@Override

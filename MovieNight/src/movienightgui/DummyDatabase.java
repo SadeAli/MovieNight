@@ -12,6 +12,7 @@ import java.util.HashMap;
  *
  * @author deneg
  */
+@SuppressWarnings(value = { "" })
 public class DummyDatabase implements IDatabase {
     
     private ArrayList<String> users = new ArrayList<>();

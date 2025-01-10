@@ -57,6 +57,12 @@ public class VoteDAO extends AbstractDAO<Vote> {
 	    // TODO: Do not insert if suggestion already exists.
 	}
 	
+	public boolean removeVotesOfMovie(int lobbyId, int movieId) {
+	    String insertQuery = "DELETE FROM " + getTableName() + " WHERE lobby_id = ? and movie_id = ?";
+	    return delete(insertQuery, lobbyId, movieId);
+	    // TODO: Do not insert if suggestion already exists.
+	}
+	
 	public boolean removeAllVotes(int lobbyId) {
 	    String insertQuery = "DELETE FROM " + getTableName() + " where lobby_id = ?";
 	    return delete(insertQuery, lobbyId);
