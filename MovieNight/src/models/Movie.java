@@ -13,6 +13,14 @@ public class Movie {
 		this.description = description;
 		this.trailerPath = trailerPath;
 	}
+	
+	public Movie(String title, String description, String trailerPath)
+	{
+		this.id = 0;
+		this.title = title;
+		this.description = description;
+		this.trailerPath = trailerPath;
+	}
 
 	public int getId() {
 		return id;

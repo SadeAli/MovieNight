@@ -28,9 +28,14 @@ public class MovieDAO extends AbstractDAO<Movie> {
 		);
 	}
 	
-	public boolean createMovie(Movie movie) {
+	public boolean createMovieWithID(Movie movie) {
 	    String insertQuery = "INSERT INTO " + getTableName() + " (id, title, description, trailerPath) VALUES (?, ?, ?, ?)";
 	    return create(insertQuery, movie.getId(), movie.getTitle(), movie.getDescription(), movie.getTrailerPath());
+	}
+	
+	public boolean createMovie(Movie movie) {
+	    String insertQuery = "INSERT INTO " + getTableName() + " (title, description, trailerPath) VALUES (?, ?, ?)";
+	    return create(insertQuery, movie.getTitle(), movie.getDescription(), movie.getTrailerPath());
 	}
 	
     public Movie findByTitle(String title) {

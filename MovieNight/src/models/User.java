@@ -17,6 +17,16 @@ public class User {
 		this.password = password;
 		this.createdAt = createdAt;
 	}
+	
+	public User(String fname, String lname, String username, String password, String createdAt)
+	{
+		this.id = 0;
+		this.fname = fname;
+		this.lname = lname;
+		this.username = username;
+		this.password = password;
+		this.createdAt = createdAt;
+	}
 
 	public int getId() {
 		return id;

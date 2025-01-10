@@ -22,13 +22,15 @@ public class DatabaseInitializer {
 	public static void initialize(Connection connection) {
 		try(Statement stmt = connection.createStatement()){
 			String createTables = """
+				CREATE SEQUENCE user_id_seq START WITH 1 INCREMENT BY 1;
 				CREATE TABLE IF NOT EXISTS "User"(
-                    id SERIAL PRIMARY KEY,
+                    id INT DEFAULT nextval('user_id_seq') PRIMARY KEY,
                     fname VARCHAR(50),
                     lname VARCHAR(50),
                     username VARCHAR(50) UNIQUE,
                     password VARCHAR(50),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    
+                    age INT CHECK (age >= 18)
                 );
 				
 				CREATE TABLE IF NOT EXISTS Movie(
@@ -78,7 +80,8 @@ public class DatabaseInitializer {
 					lobby_id INTEGER REFERENCES Lobby(id),
 					suggested_by INTEGER REFERENCES "User"(id),
 					movie_id INTEGER REFERENCES Movie(id),
-					PRIMARY KEY (lobby_id, movie_id)
+					PRIMARY KEY (lobby_id, movie_id),
+					FOREIGN KEY (movie_id) REFERENCES movie(id) ON DELETE RESTRICT
 				);
 				
 				CREATE TABLE IF NOT EXISTS Vote(
@@ -94,6 +97,107 @@ public class DatabaseInitializer {
 					receiver_id INTEGER REFERENCES "User"(id),
 					PRIMARY KEY (sender_id, receiver_id, lobby_id)
 				);
+				
+				-- A function to list the winner movies in a lobby
+				CREATE OR REPLACE FUNCTION get_winning_movies_by_votes(lobby_id INT)
+				RETURNS TABLE(movie_id INT, movie_title TEXT, vote_count INT) AS $$
+				DECLARE
+				    movie_record RECORD;
+				    movie_vote_count INT;
+				    movie_cursor CURSOR FOR 
+				        SELECT m.id, m.title
+				        FROM movie m
+				        WHERE EXISTS (
+				            SELECT 1
+				            FROM vote v
+				            WHERE v.movie_id = m.id AND v.lobby_id = lobby_id
+				        );
+				BEGIN
+				    -- Initialize an array to hold movie results
+				    CREATE TEMP TABLE movie_votes_temp (
+				        movie_title TEXT,
+				        vote_count INT
+				    );
+				
+				    -- Loop over movies in the given lobby
+				    OPEN movie_cursor;
+				    LOOP
+				        FETCH NEXT FROM movie_cursor INTO movie_record;
+				        EXIT WHEN NOT FOUND;
+				
+				        -- Count votes for the current movie
+				        SELECT COUNT(*) INTO movie_vote_count
+				        FROM vote
+				        WHERE movie_id = movie_record.id AND lobby_id = lobby_id;
+				
+				        -- Insert movie and its vote count into the temporary table
+				        INSERT INTO movie_votes_temp (movie_title, vote_count)
+				        VALUES (movie_record.title, movie_vote_count);
+				    END LOOP;
+				    CLOSE movie_cursor;
+				
+				    -- Clean up temporary table
+				    DROP TABLE movie_votes_temp;
+				
+				    RETURN;
+				END;
+				$$ LANGUAGE plpgsql;
+				
+				
+				CREATE OR REPLACE FUNCTION get_movies_by_genres_with_intersect(given_genre_ids INT[]) 
+				RETURNS TABLE(movie_info TEXT) AS $$
+				DECLARE
+				    movie_record RECORD;
+				    genre_record RECORD;
+				    movie_cursor CURSOR FOR
+				        SELECT m.id, m.title
+				        FROM movie m;
+				BEGIN
+				    -- Create a temporary table to hold movie information
+				    CREATE TEMP TABLE movie_genres_temp (
+				        movie_id INT,
+				        movie_title TEXT
+				    );
+				
+				    -- Loop through all movies
+				    OPEN movie_cursor;
+				    LOOP
+				        FETCH NEXT FROM movie_cursor INTO movie_record;
+				        EXIT WHEN NOT FOUND;
+				
+				        -- Check if the current movie has all the genres in the given genre list using INTERSECT
+				        IF EXISTS (
+				            SELECT 1
+				            FROM hasgenre hg
+				            WHERE hg.movie_id = movie_record.id
+				            AND hg.genre_id IN (SELECT * FROM unnest(given_genre_ids))
+				            INTERSECT
+				            SELECT 1
+				            FROM unnest(given_genre_ids) AS g
+				            WHERE g = hg.genre_id
+				        ) THEN
+				            -- If the movie has all the genres, insert it into the temporary table
+				            INSERT INTO movie_genres_temp (movie_id, movie_title)
+				            VALUES (movie_record.id, movie_record.title);
+				        END IF;
+				    END LOOP;
+				    CLOSE movie_cursor;
+				
+				    -- Return the movies with given genres in the required format
+				    FOR movie_record IN 
+				        SELECT movie_id, movie_title
+				        FROM movie_genres_temp
+				    LOOP
+				        -- Return the formatted string (rank - title)
+				        RETURN NEXT (movie_record.movie_id || ' - ' || movie_record.movie_title);
+				    END LOOP;
+				
+				    -- Clean up temporary table
+				    DROP TABLE movie_genres_temp;
+				
+				    RETURN;
+				END;
+				$$ LANGUAGE plpgsql;
 			""";
 			stmt.execute(createTables);
 			System.out.println("Tables created successfully!.");
@@ -141,7 +245,7 @@ public class DatabaseInitializer {
 
 		UserDAO userDAO = new UserDAO(connection);
 		for (User u : users) {
-			userDAO.createUser(u);
+			userDAO.createUserWithID(u);
 		}
 
 		Lobby defaultLobby = new Lobby(0, 0, false, new Date(System.currentTimeMillis()));
