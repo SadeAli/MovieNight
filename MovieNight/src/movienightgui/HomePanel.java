@@ -68,6 +68,7 @@ public class HomePanel extends javax.swing.JPanel {
         loginAs(sharedUserModel.getUsername());
         loadUsers();
         loadInvitations();
+        this.acceptedInvitation = null;
 
         userInviteCancelButton.setEnabled(false);
     }
@@ -141,6 +142,8 @@ public class HomePanel extends javax.swing.JPanel {
     		usersAndInvitations.put(user, true);
     	}
     	
+        invitationAcceptButton.setText("Accept");
+        invitationAcceptButton.setEnabled(false);
     	if (db.getInvitationsOfUser(loggedUser).size() > 0) {
     		displayLobbyCreate();
     	}
@@ -171,6 +174,7 @@ public class HomePanel extends javax.swing.JPanel {
     private void showLogin() {
         CardLayout cl = (CardLayout) parentFrame.getContentPane().getLayout();
         cl.show(parentFrame.getContentPane(), "login");
+        sharedUserModel.setUsername(null);
     }
 
     /**
@@ -197,6 +201,7 @@ public class HomePanel extends javax.swing.JPanel {
         loggedUserPanel = new javax.swing.JPanel();
         loggedUserLabel = new javax.swing.JLabel();
         deleteButton = new javax.swing.JButton();
+        logoutButton = new javax.swing.JButton();
         refreshButton = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
@@ -288,7 +293,7 @@ public class HomePanel extends javax.swing.JPanel {
                     .addComponent(usersScroll)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, usersPanelLayout.createSequentialGroup()
                         .addComponent(selectedUserLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 202, Short.MAX_VALUE)
                         .addComponent(userInviteCancelButton))
                     .addComponent(searchUserField))
                 .addContainerGap())
@@ -318,14 +323,24 @@ public class HomePanel extends javax.swing.JPanel {
             }
         });
 
+        logoutButton.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        logoutButton.setText("Logout");
+        logoutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logoutButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout loggedUserPanelLayout = new javax.swing.GroupLayout(loggedUserPanel);
         loggedUserPanel.setLayout(loggedUserPanelLayout);
         loggedUserPanelLayout.setHorizontalGroup(
             loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(loggedUserPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(loggedUserLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE)
-                .addGap(3, 3, 3)
+                .addComponent(loggedUserLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(logoutButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(deleteButton)
                 .addContainerGap())
         );
@@ -333,9 +348,11 @@ public class HomePanel extends javax.swing.JPanel {
             loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(loggedUserPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(loggedUserLabel)
-                    .addComponent(deleteButton))
+                .addGroup(loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(logoutButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(loggedUserLabel)
+                        .addComponent(deleteButton)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -500,6 +517,11 @@ public class HomePanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_deleteButtonActionPerformed
 
+    private void logoutButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logoutButtonActionPerformed
+        // TODO add your handling code here:
+        showLogin();
+    }//GEN-LAST:event_logoutButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton deleteButton;
@@ -512,6 +534,7 @@ public class HomePanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel loggedUserLabel;
     private javax.swing.JPanel loggedUserPanel;
+    private javax.swing.JButton logoutButton;
     private javax.swing.JButton refreshButton;
     private javax.swing.JTextField searchUserField;
     private javax.swing.JLabel selectedUserLabel;

@@ -4,10 +4,13 @@
  */
 package movienightgui;
 
+import java.awt.CardLayout;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
+import movienightgui.HomePanel;
 
 /**
  *
@@ -17,6 +20,7 @@ public class ResultPanel extends javax.swing.JPanel {
 
     private final IDatabase db;
     private final SharedUserModel sharedUserModel;
+    private final JFrame parentFrame;
     private HashMap<Integer, Integer> lobbyVotes;
 
     /**
@@ -24,10 +28,11 @@ public class ResultPanel extends javax.swing.JPanel {
      * @param db
      * @param sharedUserModel1
      */
-    public ResultPanel(IDatabase db, SharedUserModel sharedUserModel1) {
+    public ResultPanel(IDatabase db, SharedUserModel sharedUserModel, JFrame parentFrame) {
         initComponents();
         this.db = db;
-        this.sharedUserModel = sharedUserModel1;
+        this.sharedUserModel = sharedUserModel;
+        this.parentFrame = parentFrame;
     }
     
     public void init() {
@@ -62,6 +67,16 @@ public class ResultPanel extends javax.swing.JPanel {
         } 
     }
 
+    private void showHome() {
+        CardLayout cl = (CardLayout) parentFrame.getContentPane().getLayout();
+        cl.show(parentFrame.getContentPane(), "home");
+        for (Component component : parentFrame.getContentPane().getComponents()) {
+            if (component instanceof HomePanel homePanel) {
+                homePanel.init();
+            }            
+        }
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -74,6 +89,7 @@ public class ResultPanel extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
         jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         jScrollPane2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
@@ -90,6 +106,13 @@ public class ResultPanel extends javax.swing.JPanel {
         jLabel1.setForeground(new java.awt.Color(255, 51, 51));
         jLabel1.setText("NO MOVIE SELECTED :(");
 
+        jButton1.setText("Back To Home");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -98,6 +121,8 @@ public class ResultPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -105,13 +130,23 @@ public class ResultPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton1)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        showHome();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane2;

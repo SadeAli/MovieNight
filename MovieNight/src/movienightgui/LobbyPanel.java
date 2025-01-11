@@ -87,6 +87,16 @@ public class LobbyPanel extends javax.swing.JPanel {
         	readyButton.setEnabled(true);
         }
     }
+    
+    private void showHome() {
+        CardLayout cl = (CardLayout) parentFrame.getContentPane().getLayout();
+        cl.show(parentFrame.getContentPane(), "home");
+        for (Component component : parentFrame.getContentPane().getComponents()) {
+            if (component instanceof HomePanel homePanel) {
+                homePanel.init();
+            }            
+        }
+    }
 
     private void loadMovies() {
         movies = (HashMap<Integer, String>) zipToMap(db.getMovieIds(), db.getMovieTitles());
@@ -247,12 +257,14 @@ public class LobbyPanel extends javax.swing.JPanel {
         suggestionsScrollPanel = new javax.swing.JScrollPane();
         suggestionsList = new javax.swing.JList<>();
         readyButton = new javax.swing.JToggleButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
         movieInfoPanel = new javax.swing.JPanel();
         movieNameLabel = new javax.swing.JLabel();
         movieName = new javax.swing.JLabel();
         suggestButton = new javax.swing.JToggleButton();
         voteButton = new javax.swing.JToggleButton();
         voteStatusLabel = new javax.swing.JLabel();
+        backToHomeButton = new javax.swing.JButton();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
         setLayout(new javax.swing.BoxLayout(this, javax.swing.BoxLayout.Y_AXIS));
@@ -327,7 +339,7 @@ public class LobbyPanel extends javax.swing.JPanel {
             usersInLobbyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, usersInLobbyPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(usersScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)
+                .addComponent(usersScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -395,6 +407,13 @@ public class LobbyPanel extends javax.swing.JPanel {
         voteStatusLabel.setFont(new java.awt.Font("Segoe Print", 0, 12)); // NOI18N
         voteStatusLabel.setForeground(new java.awt.Color(255, 0, 0));
 
+        backToHomeButton.setText("Back To Home");
+        backToHomeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                backToHomeButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout movieInfoPanelLayout = new javax.swing.GroupLayout(movieInfoPanel);
         movieInfoPanel.setLayout(movieInfoPanelLayout);
         movieInfoPanelLayout.setHorizontalGroup(
@@ -406,12 +425,14 @@ public class LobbyPanel extends javax.swing.JPanel {
                         .addComponent(movieNameLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(movieName, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
+                    .addComponent(voteStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(movieInfoPanelLayout.createSequentialGroup()
-                        .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(suggestButton, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
-                            .addComponent(voteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(voteStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(suggestButton, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE)
+                                .addComponent(voteButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(backToHomeButton))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         movieInfoPanelLayout.setVerticalGroup(
@@ -424,10 +445,14 @@ public class LobbyPanel extends javax.swing.JPanel {
                 .addComponent(suggestButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(voteButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 238, Short.MAX_VALUE)
                 .addComponent(voteStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(backToHomeButton)
                 .addContainerGap())
         );
+
+        jScrollPane1.setViewportView(movieInfoPanel);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -439,7 +464,7 @@ public class LobbyPanel extends javax.swing.JPanel {
                     .addComponent(moviePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(usersInLobbyPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(movieInfoPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(readyButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -451,6 +476,7 @@ public class LobbyPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(moviePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -458,8 +484,7 @@ public class LobbyPanel extends javax.swing.JPanel {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(suggestionsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(readyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(movieInfoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(readyButton, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -540,11 +565,18 @@ public class LobbyPanel extends javax.swing.JPanel {
         System.out.println(votes);
     }//GEN-LAST:event_voteButtonActionPerformed
 
+    private void backToHomeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backToHomeButtonActionPerformed
+        // TODO add your handling code here:
+    	showHome();
+    }//GEN-LAST:event_backToHomeButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backToHomeButton;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel movieInfoPanel;
     private javax.swing.JLabel movieName;
     private javax.swing.JLabel movieNameLabel;
