@@ -36,7 +36,7 @@ public class VoteDAO extends AbstractDAO<Vote> {
             stmt.setInt(1, lobbyId);
             stmt.setInt(2, userId);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 results.add(mapResultSetToEntity(rs));
             }
         } catch (SQLException e) {

@@ -38,15 +38,15 @@ public class LobbyPanel extends javax.swing.JPanel {
     private DefaultListModel<String> suggestionsModel = new DefaultListModel<>();
     private ArrayList<Integer> suggestionMovieIds = new ArrayList<>();
     
-    private String selectedMovie;
-    private int selectedMovieId;
+    private String selectedMovie = "";
+    private int selectedMovieId = 0;
     private Boolean searchEmpty = true;
     
     private ArrayList<Integer> votes = new ArrayList<>();
     private final SharedUserModel sharedUserModel;
     private final JFrame parentFrame;
         
-    private final int DELAY = 200;
+    private final int DELAY = 5000;
     private final int READYWAITSECONDS = 1;
     private int readyWaitCounter = 0;
     private Timer timer;
@@ -120,6 +120,8 @@ public class LobbyPanel extends javax.swing.JPanel {
     
     private void loadVotes() {
     	votes = db.getVoteMovieIdsOfUser(ownerUser, loggedUser);
+    	System.out.println(votes);
+    	System.out.println(selectedMovie);
     }
     
     private void showSelectedMovieInfo() {
