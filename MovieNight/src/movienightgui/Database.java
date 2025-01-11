@@ -436,4 +436,9 @@ public class Database {
 	public void emptyVotes(String ownerUser) {
 		voteDAO.removeAllVotes(userDAO.findByUsername(ownerUser).getId());
 	}
+	
+	public void updatePassword(String username, String newPassword) {
+		int userId = userDAO.findByUsername(username).getId();
+		userDAO.updateUserPassword(userId, newPassword);
+	}
 }

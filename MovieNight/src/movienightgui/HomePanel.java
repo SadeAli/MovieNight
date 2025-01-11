@@ -7,6 +7,7 @@ package movienightgui;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
@@ -176,6 +177,12 @@ public class HomePanel extends javax.swing.JPanel {
         cl.show(parentFrame.getContentPane(), "login");
         sharedUserModel.setUsername(null);
     }
+    
+
+    private void showPassChange() {
+        CardLayout cl = (CardLayout) parentFrame.getContentPane().getLayout();
+        cl.show(parentFrame.getContentPane(), "change");
+	}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -202,6 +209,7 @@ public class HomePanel extends javax.swing.JPanel {
         loggedUserLabel = new javax.swing.JLabel();
         deleteButton = new javax.swing.JButton();
         logoutButton = new javax.swing.JButton();
+        changePassButton = new javax.swing.JButton();
         refreshButton = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
@@ -293,7 +301,7 @@ public class HomePanel extends javax.swing.JPanel {
                     .addComponent(usersScroll)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, usersPanelLayout.createSequentialGroup()
                         .addComponent(selectedUserLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 202, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(userInviteCancelButton))
                     .addComponent(searchUserField))
                 .addContainerGap())
@@ -331,6 +339,14 @@ public class HomePanel extends javax.swing.JPanel {
             }
         });
 
+        changePassButton.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        changePassButton.setText("Change Password");
+        changePassButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changePassButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout loggedUserPanelLayout = new javax.swing.GroupLayout(loggedUserPanel);
         loggedUserPanel.setLayout(loggedUserPanelLayout);
         loggedUserPanelLayout.setHorizontalGroup(
@@ -338,6 +354,8 @@ public class HomePanel extends javax.swing.JPanel {
             .addGroup(loggedUserPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(loggedUserLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(changePassButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(logoutButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -352,7 +370,8 @@ public class HomePanel extends javax.swing.JPanel {
                     .addComponent(logoutButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(loggedUserLabel)
-                        .addComponent(deleteButton)))
+                        .addComponent(deleteButton)
+                        .addComponent(changePassButton)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -521,9 +540,14 @@ public class HomePanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         showLogin();
     }//GEN-LAST:event_logoutButtonActionPerformed
+    
+	private void changePassButtonActionPerformed(ActionEvent evt) {
+		// TODO Auto-generated method stub
+		showPassChange();
+	}
 
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+	// Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton changePassButton;
     private javax.swing.JButton deleteButton;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;

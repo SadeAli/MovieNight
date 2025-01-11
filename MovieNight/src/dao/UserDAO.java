@@ -53,4 +53,9 @@ public class UserDAO extends AbstractDAO<User> {
         String updateQuery = "UPDATE " + getTableName() + " SET fname = ?, lname = ? WHERE id = ?";
         return update(updateQuery, fname, lname, userId);
     }
+    
+    public boolean updateUserPassword(int userId, String password) {
+        String updateQuery = "UPDATE " + getTableName() + " SET password = ? WHERE id = ?";
+        return update(updateQuery, password, userId);
+    }
 }

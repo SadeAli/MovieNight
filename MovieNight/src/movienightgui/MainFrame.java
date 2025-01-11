@@ -25,6 +25,7 @@ public class MainFrame extends javax.swing.JFrame {
         this.add(new LobbyPanel(db, sharedUserModel, this), "lobby");
         this.add(new CreateUserPanel(db, this), "create");
         this.add(new ResultPanel(db, sharedUserModel, this), "result");
+        this.add(new PasswordChangePanel(db, sharedUserModel, this), "change");
 
         // Set default card
         CardLayout layout = (CardLayout) this.getContentPane().getLayout();
