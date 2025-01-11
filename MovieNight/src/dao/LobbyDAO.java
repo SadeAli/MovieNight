@@ -4,8 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import models.Lobby;
+import models.Movie;
 
 public class LobbyDAO extends AbstractDAO<Lobby> {
 	public LobbyDAO(Connection connection) {
@@ -50,6 +53,35 @@ public class LobbyDAO extends AbstractDAO<Lobby> {
 	        System.err.println("Error checking lobby existence: " + e.getMessage());
 	    }
 	    return false;
+	}
+	
+	public class VoteResult {
+	    public int movieID;
+	    public String movieTitle;  // Should be a String for the movie title
+	    public int voteCount;
+	}
+
+	public VoteResult[] getWinningMoviesByVotes(int lobbyID) {
+	    List<VoteResult> results = new ArrayList<>();  // Use a list to dynamically collect results
+
+	    String query = "SELECT get_winning_movies_by_votes(?)";
+	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
+	        stmt.setInt(1, lobbyID);
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            while (rs.next()) {
+	                VoteResult result = new VoteResult();
+	                result.movieID = rs.getInt("movie_id");  // Assuming movie_id is in the result set
+	                result.movieTitle = rs.getString("movie_title");  // Assuming movie_title is in the result set
+	                result.voteCount = rs.getInt("vote_count");  // Assuming vote_count is in the result set
+	                results.add(result);
+	            }
+	        }
+	    } catch (SQLException e) {
+	        System.err.println("Error checking lobby existence: " + e.getMessage());
+	        return null;
+	    }
+
+	    return results.toArray(new VoteResult[0]);  // Convert the list to an array and return it
 	}
 	
 	public boolean setLobbyReady(int lobbyId) {

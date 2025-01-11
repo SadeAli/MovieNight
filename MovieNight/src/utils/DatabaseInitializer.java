@@ -22,13 +22,15 @@ public class DatabaseInitializer {
 	public static void initialize(Connection connection) {
 		try(Statement stmt = connection.createStatement()){
 			String createTables = """
+				CREATE SEQUENCE user_id_seq START WITH 1 INCREMENT BY 1;
 				CREATE TABLE IF NOT EXISTS "User"(
-                    id SERIAL PRIMARY KEY,
+                    id INT DEFAULT nextval('user_id_seq') PRIMARY KEY,
                     fname VARCHAR(50),
                     lname VARCHAR(50),
                     username VARCHAR(50) UNIQUE,
                     password VARCHAR(50),
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,    
+                    age INT CHECK (age >= 18)
                 );
 				
 				CREATE TABLE IF NOT EXISTS Movie(
@@ -78,7 +80,8 @@ public class DatabaseInitializer {
 					lobby_id INTEGER REFERENCES Lobby(id),
 					suggested_by INTEGER REFERENCES "User"(id),
 					movie_id INTEGER REFERENCES Movie(id),
-					PRIMARY KEY (lobby_id, movie_id)
+					PRIMARY KEY (lobby_id, movie_id),
+					FOREIGN KEY (movie_id) REFERENCES movie(id) ON DELETE RESTRICT
 				);
 				
 				CREATE TABLE IF NOT EXISTS Vote(
@@ -94,6 +97,131 @@ public class DatabaseInitializer {
 					receiver_id INTEGER REFERENCES "User"(id),
 					PRIMARY KEY (sender_id, receiver_id, lobby_id)
 				);
+				
+				-- A function to list the winner movies in a lobby
+				CREATE OR REPLACE FUNCTION get_winning_movies_by_votes(lobby_id INT)
+				RETURNS TABLE(movie_id INT, movie_title TEXT, vote_count INT) AS $$
+				DECLARE
+				    movie_record RECORD;
+				    movie_vote_count INT;
+				    movie_cursor CURSOR FOR 
+				        SELECT m.id, m.title
+				        FROM movie m
+				        WHERE EXISTS (
+				            SELECT 1
+				            FROM vote v
+				            WHERE v.movie_id = m.id AND v.lobby_id = lobby_id
+				        );
+				BEGIN
+				    -- Initialize an array to hold movie results
+				    CREATE TEMP TABLE movie_votes_temp (
+				        movie_title TEXT,
+				        vote_count INT
+				    );
+				
+				    -- Loop over movies in the given lobby
+				    OPEN movie_cursor;
+				    LOOP
+				        FETCH NEXT FROM movie_cursor INTO movie_record;
+				        EXIT WHEN NOT FOUND;
+				
+				        -- Count votes for the current movie
+				        SELECT COUNT(*) INTO movie_vote_count
+				        FROM vote
+				        WHERE movie_id = movie_record.id AND lobby_id = lobby_id;
+				
+				        -- Insert movie and its vote count into the temporary table
+				        INSERT INTO movie_votes_temp (movie_title, vote_count)
+				        VALUES (movie_record.title, movie_vote_count);
+				    END LOOP;
+				    CLOSE movie_cursor;
+				
+				    -- Select the result from the temporary table, ensuring the movie has at least 1 vote
+				    RETURN QUERY
+				    SELECT movie_id, movie_title, vote_count
+				    FROM movie_votes_temp
+				    HAVING vote_count > 0;
+				
+				    -- Clean up temporary table
+				    DROP TABLE movie_votes_temp;
+				
+				    RETURN;
+				END;
+				$$ LANGUAGE plpgsql;
+				
+				CREATE OR REPLACE FUNCTION get_movies_by_all_genres(given_genre_ids INT[])
+				RETURNS TABLE(id INT, title TEXT, description TEXT, trailer_path TEXT) AS $$
+				BEGIN
+				    RETURN QUERY
+				    -- Select all movies where their genres intersect with the given genres
+				    SELECT m.id, m.title, m.description, m.trailer_path
+				    FROM movie m
+				    WHERE EXISTS (
+				        -- Find the intersection of the movie's genres and the given genres
+				        SELECT 1
+				        FROM hasgenre hg
+				        WHERE hg.movie_id = m.id
+				        INTERSECT
+				        SELECT unnest(given_genre_ids)
+				    )
+				    AND (
+				        -- Ensure the movie contains all the given genres
+				        SELECT COUNT(DISTINCT genre_id)
+				        FROM hasgenre hg
+				        WHERE hg.movie_id = m.id
+				        INTERSECT
+				        SELECT unnest(given_genre_ids)
+				    ) = array_length(given_genre_ids, 1);
+				END;
+				$$ LANGUAGE plpgsql;
+				
+				CREATE OR REPLACE FUNCTION prevent_unsuggest_if_voted()
+				RETURNS TRIGGER AS $$
+				BEGIN
+				    -- Check if there are votes for the movie in the current lobby
+				    IF EXISTS (
+				        SELECT 1
+				        FROM vote
+				        WHERE movie_id = OLD.movie_id
+				          AND lobby_id = OLD.lobby_id
+				    ) THEN
+				        -- Raise an error to prevent deletion
+				        RAISE EXCEPTION 'Cannot unsuggest this movie as it has already been voted on.';
+				    END IF;
+				
+				    -- Allow the delete if no votes exist
+				    RETURN OLD;
+				END;
+				$$ LANGUAGE plpgsql;
+				
+				CREATE TRIGGER prevent_unsuggest_if_voted_trigger
+				BEFORE DELETE ON suggestion
+				FOR EACH ROW
+				EXECUTE FUNCTION prevent_unsuggest_if_voted();
+				
+				CREATE OR REPLACE FUNCTION delete_lobby_when_empty()
+				RETURNS TRIGGER AS $$
+				BEGIN
+				    -- Check if there are no users left in the lobby
+				    IF NOT EXISTS (
+				        SELECT 1
+				        FROM inlobby
+				        WHERE lobby_id = OLD.lobby_id
+				    ) THEN
+				        -- Delete the lobby if no users are left
+				        DELETE FROM lobby
+				        WHERE id = OLD.lobby_id;
+				    END IF;
+				
+				    -- Return the OLD row (not used, but required for the trigger)
+				    RETURN OLD;
+				END;
+				$$ LANGUAGE plpgsql;
+
+				CREATE TRIGGER delete_lobby_if_empty
+				AFTER DELETE ON inlobby
+				FOR EACH ROW
+				EXECUTE FUNCTION delete_lobby_when_empty();
 			""";
 			stmt.execute(createTables);
 			System.out.println("Tables created successfully!.");
@@ -141,7 +269,7 @@ public class DatabaseInitializer {
 
 		UserDAO userDAO = new UserDAO(connection);
 		for (User u : users) {
-			userDAO.createUser(u);
+			userDAO.createUserWithID(u);
 		}
 
 		Lobby defaultLobby = new Lobby(0, 0, false, new Date(System.currentTimeMillis()));
@@ -181,7 +309,7 @@ public class DatabaseInitializer {
 		
 		MovieDAO movieDAO = new MovieDAO(connection);
 		for (Movie m : movies) {
-			movieDAO.createMovie(m);
+			movieDAO.createMovieWithID(m);
 		}
 
 		// NOTE: at least 10 genres added
