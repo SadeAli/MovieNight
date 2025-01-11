@@ -19,14 +19,14 @@ public class LoginPanel extends javax.swing.JPanel {
     
     private String loggedUsername;
     private HashMap<String, String> usersAndPasswords;
-    private IDatabase db;
+    private Database db;
     private SharedUserModel sharedUserModel;
     private JFrame parentFrame; 
 
     /**
      * Creates new form LoginPanel
      */
-    public LoginPanel(IDatabase db, SharedUserModel sharedUserModel, JFrame parentFrame) {
+    public LoginPanel(Database db, SharedUserModel sharedUserModel, JFrame parentFrame) {
         this.db = db;
         this.usersAndPasswords = db.getUsersAndPasswords();
         this.sharedUserModel = sharedUserModel;

@@ -30,7 +30,7 @@ public class LobbyPanel extends javax.swing.JPanel {
 
     private String ownerUser;
     private String loggedUser;
-    private IDatabase db;
+    private Database db;
     
     private HashMap<Integer, String> movies = new HashMap<>();
     private DefaultListModel<String> moviesModel = new DefaultListModel<>();
@@ -54,7 +54,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     /**
      * Creates new form LobbyPanel
      */
-    public LobbyPanel(IDatabase db, SharedUserModel sharedUserModel, JFrame parentFrame) {
+    public LobbyPanel(Database db, SharedUserModel sharedUserModel, JFrame parentFrame) {
         initComponents();
         this.db = db;
         this.sharedUserModel = sharedUserModel;

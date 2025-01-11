@@ -18,7 +18,7 @@ import movienightgui.HomePanel;
  */
 public class ResultPanel extends javax.swing.JPanel {
 
-    private final IDatabase db;
+    private final Database db;
     private final SharedUserModel sharedUserModel;
     private final JFrame parentFrame;
     private HashMap<Integer, Integer> lobbyVotes;
@@ -28,7 +28,7 @@ public class ResultPanel extends javax.swing.JPanel {
      * @param db
      * @param sharedUserModel1
      */
-    public ResultPanel(IDatabase db, SharedUserModel sharedUserModel, JFrame parentFrame) {
+    public ResultPanel(Database db, SharedUserModel sharedUserModel, JFrame parentFrame) {
         initComponents();
         this.db = db;
         this.sharedUserModel = sharedUserModel;

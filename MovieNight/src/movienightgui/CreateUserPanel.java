@@ -15,13 +15,13 @@ import javax.swing.event.DocumentListener;
  */
 public class CreateUserPanel extends javax.swing.JPanel {
 
-    private IDatabase db;
+    private Database db;
     private JFrame parentFrame;
     
     /**
      * Creates new form CreateUserPanel
      */
-    public CreateUserPanel(IDatabase db, JFrame parentFrame) {
+    public CreateUserPanel(Database db, JFrame parentFrame) {
         this.db = db;
         this.parentFrame = parentFrame;
         initComponents();

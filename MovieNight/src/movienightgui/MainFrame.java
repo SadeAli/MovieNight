@@ -15,7 +15,7 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Creates new form MainGUI
      */
-    public MainFrame(IDatabase db) {
+    public MainFrame(Database db) {
         initComponents();
 
         SharedUserModel sharedUserModel = new SharedUserModel();
@@ -97,14 +97,6 @@ public class MainFrame extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainFrame(new DummyDatabase()).setVisible(true);
-            }
-        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

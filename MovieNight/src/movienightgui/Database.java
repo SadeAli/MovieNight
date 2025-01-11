@@ -9,7 +9,7 @@ import java.util.Random;
 import dao.*;
 import models.*;
 
-public class Database implements IDatabase {
+public class Database {
 	
 	private UserDAO userDAO;
 	private InvitationDAO invitationDAO;
@@ -29,13 +29,12 @@ public class Database implements IDatabase {
 		this.lobbyDAO = new LobbyDAO(connection);
 	}
 	
-	@Override
 	public void removeVotesForMovie(String ownerUser, int movieId) {
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
 		voteDAO.removeVotesOfMovie(lobbyId, movieId);
 	}
 	
-	@Override
+	
 	public String getSuggestedByUsername(int suggestedMovieId, String ownerUser) {
 		ArrayList<Suggestion> suggestions = (ArrayList<Suggestion>) suggestionDAO.findByLobbyId(userDAO.findByUsername(ownerUser).getId());
 		for (Suggestion s : suggestions) {
@@ -46,7 +45,7 @@ public class Database implements IDatabase {
 		return null;
 	}
 	
-	@Override
+	
 	public boolean validateLogin(String username, String password) {
 		User user = userDAO.findByUsername(username);
 		if (user instanceof User && user.getPassword().equals(password)) {
@@ -55,13 +54,13 @@ public class Database implements IDatabase {
 		return false;
 	}
 
-	@Override
+	
 	public HashMap<String, String> getUsersAndPasswords() {
 		return null;
 		// TODO: Not needed
 	}
 
-	@Override
+	
 	public ArrayList<String> getUsers() {
 		ArrayList<String> usernames = new ArrayList<>();
 		for (User user : userDAO.findAll()) {
@@ -70,7 +69,7 @@ public class Database implements IDatabase {
 		return usernames;
 	}
 
-	@Override
+	
 	public ArrayList<String> getInvitiationsForUser(String username) {
 		int receiverId = userDAO.findByUsername(username).getId();
 		List<Invitation> invitations = invitationDAO.findByReceiver(receiverId);
@@ -83,7 +82,7 @@ public class Database implements IDatabase {
 		return invitationSenders;
 	}
 	
-	@Override
+	
 	public ArrayList<String> getInvitationsOfUser(String username) {
 		int senderId = userDAO.findByUsername(username).getId();
 		List<Invitation> invitations = invitationDAO.findBySender(senderId);
@@ -96,7 +95,7 @@ public class Database implements IDatabase {
 		return invitationReceivers;
 	}
 	
-	@Override
+	
 	public void sendInvitationToUser(String fromUser, String toUser) {
 		int senderId = userDAO.findByUsername(fromUser).getId();
 		int receiverId = userDAO.findByUsername(toUser).getId();
@@ -105,7 +104,7 @@ public class Database implements IDatabase {
 		// TODO: Putting senderId instead of lobbyId.
 	}
 
-	@Override
+	
 	public void removeInvitationFromUser(String user, String sender) {
 		int senderId = userDAO.findByUsername(sender).getId();
 		int receiverId = userDAO.findByUsername(user).getId();
@@ -114,7 +113,7 @@ public class Database implements IDatabase {
 		// TODO: Is correct?
 	}
 
-	@Override
+	
 	public ArrayList<String> getUsersAtLobby(String ownerUser) {
 		ArrayList<String> usernames = new ArrayList<String>();
 		int lobbyOwnerId = userDAO.findByUsername(ownerUser).getId();
@@ -126,7 +125,7 @@ public class Database implements IDatabase {
 		return usernames;
 	}
 
-	@Override
+	
 	public ArrayList<String> getMovieTitles() {
 		ArrayList<String> movieTitles = new ArrayList<String>();
 		for (Movie movie : movieDAO.findAll()) {
@@ -135,13 +134,13 @@ public class Database implements IDatabase {
 		return movieTitles;
 	}
 	
-	@Override
+	
 	public String getMovieTitle(int movieId) {
 		Movie movie = movieDAO.findById(movieId);
 		return movie.getTitle() + " (" + movie.getId() + ")";
 	}
 	
-	@Override
+	
 	public ArrayList<Integer> getMovieIds() {
 		ArrayList<Integer> ids = new ArrayList<>();
 		for (Movie movie : movieDAO.findAll()) {
@@ -150,7 +149,7 @@ public class Database implements IDatabase {
 		return ids;
 	}
 
-	@Override
+	
 	public void suggestMovie(String ownerUser, String user, int movieId) {
 		
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
@@ -164,7 +163,7 @@ public class Database implements IDatabase {
 	    }
 	}
 
-	@Override
+	
 	public ArrayList<String> getSuggestions(String ownerUser) {
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
 		System.out.println(suggestionDAO.findByLobbyId(lobbyId));
@@ -186,7 +185,7 @@ public class Database implements IDatabase {
     	// TODO deprecated
     }
 
-	@Override
+	
 	public HashMap<Integer, Integer> getVotes2(String ownerUser) {
 		
 		// Movie name by vote count.
@@ -208,7 +207,7 @@ public class Database implements IDatabase {
 		return votes;
 	}
 	
-	@Override
+	
 	public ArrayList<Integer> getVoteMovieIdsOfUser(String ownerUser, String username) {
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
 		int userId = userDAO.findByUsername(username).getId();
@@ -220,7 +219,7 @@ public class Database implements IDatabase {
 		return votedMovieIds;
 	}
 
-	@Override
+	
 	public void createLobby(String ownerUser) {
 	    int ownerId = userDAO.findByUsername(ownerUser).getId();
 
@@ -233,7 +232,7 @@ public class Database implements IDatabase {
 	    }
 	}
 
-	@Override
+	
 	public void addUserToLobby(String ownerUser, String username) {
 		int ownerId = userDAO.findByUsername(ownerUser).getId();
 		Lobby lobby = lobbyDAO.findById(ownerId);
@@ -243,7 +242,7 @@ public class Database implements IDatabase {
 		inLobbyDAO.assignUserToLobby(user, lobby);
 	}
 
-	@Override
+	
 	public void removeUserFromLobby(String ownerUser, String username) {
 		int ownerId = userDAO.findByUsername(ownerUser).getId();
 		Lobby lobby = lobbyDAO.findById(ownerId);
@@ -251,50 +250,50 @@ public class Database implements IDatabase {
 		inLobbyDAO.removeUserToLobby(user, lobby);
 	}
 
-	@Override
+	
 	public void deleteLobby(String ownerUser) {
 		int ownerId = userDAO.findByUsername(ownerUser).getId();
 		lobbyDAO.deleteLobby(ownerId);
 		// TODO Keep in mind, ownerId == lobbyId
 	}
 
-	@Override
+	
 	public void removeSuggestion(String ownerUser, int movieId) {
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
 		suggestionDAO.removeSuggestion(lobbyId, movieId);
 	}
 
-	@Override
+	
 	public String getBelongingLobbyOwner(String user) {
 		int userId = userDAO.findByUsername(user).getId();
 		int ownerId = inLobbyDAO.findByUserId(userId).getLobbyId();
 		return userDAO.findById(ownerId).getUsername();
 	}
 
-	@Override
+	
 	public void updateVotesUserReady(String ownerUser, ArrayList<String> votedMoviesOfUser) {
 		// TODO deprecated probably...
 		// But if ready, prevent continuing?
 	}
 
-	@Override
+	
 	public boolean isLobbyStillVoting(String ownerUser) {
 		int ownerId = userDAO.findByUsername(ownerUser).getId();
 		return !lobbyDAO.findById(ownerId).isReady();
 	}
 
-	@Override
+	
 	public int getLobbyReadyCount(String ownerUser) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
+	
 	public boolean isUsernameExists(String username) {
 		return userDAO.findByUsername(username) != null;
 	}
 
-	@Override
+	
 	public int addUser(String username, String password, int age) {
 	    // Check if the username is blank
 	    if (username == null || username.trim().isEmpty()) {
@@ -325,13 +324,13 @@ public class Database implements IDatabase {
 	    return 0; // Success
 	}
 
-	@Override
+	
 	public boolean deleteUser(String username) {
 	    User user = userDAO.findByUsername(username);
 	    return userDAO.deleteById(user.getId());
 	}
 
-	@Override
+	
 	public void suggestMovie(String ownerUser, String movieName) {
 	    int lobbyId = userDAO.findByUsername(ownerUser).getId();
 	    Movie movie = movieDAO.findByTitle(movieName);
@@ -340,7 +339,7 @@ public class Database implements IDatabase {
 	    }
 	}
 
-	@Override
+	
 	public void removeSuggestion(String ownerUser, String movieName) {
 	    int lobbyId = userDAO.findByUsername(ownerUser).getId();
 	    Movie movie = movieDAO.findByTitle(movieName);
@@ -349,31 +348,31 @@ public class Database implements IDatabase {
 	    }
 	}
 
-	@Override
+	
 	public void setLobbyReady(String ownerUser) {
 		lobbyDAO.setLobbyReady(userDAO.findByUsername(ownerUser).getId());
 	}
 
-	@Override
+	
 	public void emptyLobby(String ownerUser) {
 		int ownerId = userDAO.findByUsername(ownerUser).getId();
 		Lobby lobby = lobbyDAO.findById(ownerId);
 		inLobbyDAO.removeAllUsers(lobby);
 	}
 
-	@Override
+	
 	public void emptyInvitations(String sender) {
 		int ownerId = userDAO.findByUsername(sender).getId();
 		invitationDAO.removeAllInvitations(ownerId);
 	}
 
-	@Override
+	
 	public void removeSuggestion(String ownerUser, String user, String movieName) {
 		// TODO Auto-generated method stub
 		
 	}
 	
-	@Override
+	
 	public ArrayList<Integer> getSuggestedMovieIds(String ownerUser) {
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
 		ArrayList<Integer> suggestions = new ArrayList<>();
@@ -383,7 +382,7 @@ public class Database implements IDatabase {
 		return suggestions;
 	}
 	
-	@Override
+	
 	public String getSuggestionTitle(String ownerUser, int movieId, String suggestedBy) {
 		int voteCount = getVotes2(ownerUser).get(movieId);
 		Movie m = movieDAO.findById(movieId);
@@ -391,7 +390,7 @@ public class Database implements IDatabase {
 				m.getTitle(), m.getId(), suggestedBy, voteCount);
 	}
 	
-	@Override
+	
 	public ArrayList<String> getSuggestionTitles(String ownerUser) {
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
 		ArrayList<String> suggestionTitles = new ArrayList<>();
@@ -402,38 +401,38 @@ public class Database implements IDatabase {
 		return suggestionTitles;
 	}
 
-	@Override
+	
 	public ArrayList<String> getMovies() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	@Override
+	
 	public void voteMovie(String user, String ownerUser, int movieId) {
 		voteDAO.addVote(
 				userDAO.findByUsername(ownerUser).getId(), 
 				userDAO.findByUsername(user).getId(), movieId);
 	}
 	
-	@Override
+	
 	public void removeVote(String user, String ownerUser, int movieId) {
 		voteDAO.removeVote(
 				userDAO.findByUsername(ownerUser).getId(), 
 				userDAO.findByUsername(user).getId(), movieId);
 	}
 	
-	@Override
+	
 	public void emptySuggestions(String ownerUser) {
 		suggestionDAO.removeAllSuggestions(userDAO.findByUsername(ownerUser).getId());
 	}
 
-	@Override
+	
 	public void emptySuggestions(int lobbyId) {
 		// TODO Auto-generated method stub
 		
 	}
 	
-	@Override
+	
 	public void emptyVotes(String ownerUser) {
 		voteDAO.removeAllVotes(userDAO.findByUsername(ownerUser).getId());
 	}

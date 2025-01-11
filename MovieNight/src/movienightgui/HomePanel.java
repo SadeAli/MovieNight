@@ -24,7 +24,7 @@ public class HomePanel extends javax.swing.JPanel {
     private ArrayList<String> users = new ArrayList<>();
     private DefaultListModel<String> usersModel = new DefaultListModel<>();
     private HashMap<String, Boolean> usersAndInvitations = new HashMap<>();
-    private IDatabase db;
+    private Database db;
     
     private String selectedUser = "";
     private ArrayList<String> invitedUsers = new ArrayList<>();
@@ -55,7 +55,7 @@ public class HomePanel extends javax.swing.JPanel {
      * @param loggedUser
      * @param db
      */
-    public HomePanel(IDatabase db, SharedUserModel sharedUserModel, JFrame parentFrame) {
+    public HomePanel(Database db, SharedUserModel sharedUserModel, JFrame parentFrame) {
         initComponents();
         this.db = db;
         this.sharedUserModel = sharedUserModel;
