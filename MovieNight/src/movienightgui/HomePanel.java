@@ -149,6 +149,8 @@ public class HomePanel extends javax.swing.JPanel {
         		usersAndInvitations.remove(user);
         	}
         } // Update for deleted users
+        
+        updateInLobby();
     }
     
     private void loadInvitations() {
@@ -161,8 +163,10 @@ public class HomePanel extends javax.swing.JPanel {
     	System.out.println(db.getInvitationsOfUser(loggedUser));
     	
     	// invitations sent from the logged user
+        invitationsSentToLabel.setText("Invitations sent to: ");
     	for (String user : db.getInvitationsOfUser(loggedUser)) {
     		usersAndInvitations.put(user, true);
+    		invitationsSentToLabel.setText(invitationsSentToLabel.getText() + user + ", ");
     	}
     	
         invitationAcceptButton.setText("Accept");
@@ -170,6 +174,22 @@ public class HomePanel extends javax.swing.JPanel {
     	if (db.getInvitationsOfUser(loggedUser).size() > 0) {
     		displayLobbyCreate();
     	}
+    }
+    
+    private void updateSentInvitations() {
+        invitationsSentToLabel.setText("Invitations sent to: ");
+    	for (String user : db.getInvitationsOfUser(loggedUser)) {
+            invitationsSentToLabel.setText(invitationsSentToLabel.getText() + user + ", ");
+    	}
+    	System.out.println(loggedUser + " " + db.getInvitationsOfUser(loggedUser));
+    }
+    
+    private void updateInLobby() {
+        inLobbyLabel.setText("Users in " + loggedUser + "'s lobby: ");
+    	for (String user : db.getUsersAtLobby(loggedUser)) {
+            inLobbyLabel.setText(inLobbyLabel.getText() + user + ", ");
+    	}
+    	System.out.println(loggedUser + " " + db.getUsersAtLobby(loggedUser));
     }
     
     private void displayInvitations() {
@@ -231,7 +251,9 @@ public class HomePanel extends javax.swing.JPanel {
         loggedUserLabel = new javax.swing.JLabel();
         deleteButton = new javax.swing.JButton();
         logoutButton = new javax.swing.JButton();
-        changePassButton = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        invitationsSentToLabel = new javax.swing.JLabel();
+        inLobbyLabel = new javax.swing.JLabel();
         refreshButton = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
@@ -361,13 +383,21 @@ public class HomePanel extends javax.swing.JPanel {
             }
         });
 
-        changePassButton.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
-        changePassButton.setText("Change Password");
-        changePassButton.addActionListener(new java.awt.event.ActionListener() {
+        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        jButton1.setText("Change Password");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                changePassButtonActionPerformed(evt);
+            	changePassButtonActionPerformed(evt);
             }
         });
+
+        invitationsSentToLabel.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        invitationsSentToLabel.setForeground(new java.awt.Color(0, 204, 0));
+        invitationsSentToLabel.setText("jLabel1");
+
+        inLobbyLabel.setFont(new java.awt.Font("Segoe UI", 0, 10)); // NOI18N
+        inLobbyLabel.setForeground(new java.awt.Color(255, 0, 51));
+        inLobbyLabel.setText("jLabel1");
 
         javax.swing.GroupLayout loggedUserPanelLayout = new javax.swing.GroupLayout(loggedUserPanel);
         loggedUserPanel.setLayout(loggedUserPanelLayout);
@@ -375,13 +405,17 @@ public class HomePanel extends javax.swing.JPanel {
             loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(loggedUserPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(loggedUserLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(changePassButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(logoutButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(deleteButton)
+                .addGroup(loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(invitationsSentToLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(loggedUserPanelLayout.createSequentialGroup()
+                        .addComponent(loggedUserLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 126, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(logoutButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(deleteButton))
+                    .addComponent(inLobbyLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         loggedUserPanelLayout.setVerticalGroup(
@@ -389,11 +423,15 @@ public class HomePanel extends javax.swing.JPanel {
             .addGroup(loggedUserPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(logoutButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(logoutButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, loggedUserPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(loggedUserLabel)
                         .addComponent(deleteButton)
-                        .addComponent(changePassButton)))
+                        .addComponent(jButton1)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(invitationsSentToLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(inLobbyLabel)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -520,6 +558,7 @@ public class HomePanel extends javax.swing.JPanel {
             userInviteCancelButton.setText("Cancel");
             db.sendInvitationToUser(loggedUser, selectedUser);
         }
+        updateSentInvitations();
         System.out.println(selectedUser + db.getInvitiationsForUser(selectedUser));
     }//GEN-LAST:event_userInviteCancelButtonActionPerformed
 
@@ -571,15 +610,17 @@ public class HomePanel extends javax.swing.JPanel {
 		showPassChange();
 	}
 
-	// Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton changePassButton;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton deleteButton;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
+    private javax.swing.JLabel inLobbyLabel;
     private javax.swing.JButton invitationAcceptButton;
     private javax.swing.JList<String> invitationsList;
     private javax.swing.JPanel invitationsPanel;
     private javax.swing.JScrollPane invitationsScroll;
+    private javax.swing.JLabel invitationsSentToLabel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel loggedUserLabel;
     private javax.swing.JPanel loggedUserPanel;
