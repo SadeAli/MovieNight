@@ -79,6 +79,7 @@ public class UserDAO extends AbstractDAO<User> {
             System.err.println("getUserByCredentials error: " + e.getMessage());
         }
         return null;
+    }
 
     public List<String> findAllUsername() {
         String query = "SELECT * FROM user_identifiers";
