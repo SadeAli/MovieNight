@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.Timer;
@@ -669,7 +668,11 @@ public class LobbyPanel extends javax.swing.JPanel {
         loadLobbyUsers();
         loadSuggestions();
         loadVotes();
-        showSelectedMovieInfo();        
+        showSelectedMovieInfo();       
+        
+        if (!db.isLobbyStillVoting(ownerUser)) {
+        	showResults();
+        }
     }//GEN-LAST:event_refreshButtonActionPerformed
 
 
