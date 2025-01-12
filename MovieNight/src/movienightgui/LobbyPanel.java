@@ -42,6 +42,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private String selectedMovie = "";
     private int selectedMovieId = 0;
     private Boolean searchEmpty = true;
+    private ArrayList<Integer> searchedMovies = new ArrayList<>();
     
     private int genreIndex = 0;
     private String genreName = "";
@@ -50,7 +51,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private final SharedUserModel sharedUserModel;
     private final JFrame parentFrame;
         
-    private final int DELAY = 10;
+    private final int DELAY = 1000;
     private final int READYWAITSECONDS = 1;
     private int readyWaitCounter = 0;
     private Timer timer;
@@ -107,6 +108,8 @@ public class LobbyPanel extends javax.swing.JPanel {
         moviesModel.removeAllElements();
         moviesModel.addAll(movies.values());
         moviesList.setModel(moviesModel);
+        
+        searchedMovies.addAll(movies.keySet());
     }
     
     private void loadLobbyUsers() {
@@ -170,6 +173,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private void search(String input) {
         moviesModel.removeAllElements();
         moviesModel.addAll(movies.values());
+        searchedMovies.clear();
     	ArrayList<Integer> genreMovieIds = db.findMovieIdsByGenres(parseGenreField());
 
         for (Integer movieId : movies.keySet()) {
@@ -177,11 +181,15 @@ public class LobbyPanel extends javax.swing.JPanel {
 
         	if (!genreMovieIds.isEmpty() && !genreMovieIds.contains(movieId)) {
         		moviesModel.removeElement(title);
-        	}
-        	
-            if (!title.contains(input)) {
+        	} 
+
+        	if (!title.contains(input)) {
                 moviesModel.removeElement(title);
             }
+        	
+        	if (moviesModel.contains(title)) {
+            	searchedMovies.add(movieId);
+        	}
         }
     }
     
@@ -219,6 +227,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         searchEmpty = true;
         searchMovieField.setText("Search movie...");
         searchMovieField.setForeground(Color.GRAY);
+        genreField.setText("");
     }
     
     private void initDatabaseAccessTimer() {
@@ -571,7 +580,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         if (moviesList.getSelectedValue() != null) {
             selectedMovie = moviesList.getSelectedValue();
-            selectedMovieId = new ArrayList<Integer>(movies.keySet()).get(moviesList.getSelectedIndex());
+            selectedMovieId = searchedMovies.get(moviesList.getSelectedIndex());
             showSelectedMovieInfo();
         }
     }//GEN-LAST:event_moviesListMouseClicked

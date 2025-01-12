@@ -463,11 +463,13 @@ public class Database {
 				genreIds.add(g.getId());
 			}
 		}
-		ArrayList<Movie> movies = (ArrayList<Movie>) movieDAO.findMoviesByGenres(genreIds.toArray(new Integer[0]));
+		int[] genreIdsArray = genreIds.stream().mapToInt(Integer::intValue).toArray();
+		ArrayList<Movie> movies = (ArrayList<Movie>) movieDAO.findMoviesByGenres(genreIdsArray);
 		ArrayList<Integer> movieIds = new ArrayList<>();
 		for (Movie m : movies) {
 			movieIds.add(m.getId());
 		}
+		System.out.println(movieIds);
 		return movieIds;
 	}
 	
