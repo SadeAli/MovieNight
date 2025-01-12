@@ -98,7 +98,6 @@ public class DatabaseInitializer {
 					PRIMARY KEY (sender_id, receiver_id, lobby_id)
 				);
 				
-				
 				CREATE OR REPLACE FUNCTION get_winning_movies_by_votes(param_lobby_id INT)
 				RETURNS TABLE(movie_id INT, movie_title TEXT, vote_count INT) AS $$
 				DECLARE
@@ -138,11 +137,15 @@ public class DatabaseInitializer {
 				    END LOOP;
 				    CLOSE movie_cursor;
 				
-				    -- Return the results from the temporary table, ensuring the movie has at least 1 vote
+				    -- Return the results from the temporary table, using HAVING to exclude movies with 0 votes
 				    RETURN QUERY
-				    SELECT temp_movie_id AS movie_id, temp_movie_title AS movie_title, temp_vote_count AS vote_count
+				    SELECT temp_movie_id AS movie_id, 
+				           temp_movie_title AS movie_title, 
+				           CAST(SUM(temp_vote_count) AS INT) AS vote_count
 				    FROM movie_votes_temp
-				    WHERE temp_vote_count > 0;
+				    GROUP BY temp_movie_id, temp_movie_title
+				    HAVING SUM(temp_vote_count) > 0
+				    ORDER BY vote_count DESC;
 				
 				    RETURN;
 				END;
@@ -233,6 +236,28 @@ public class DatabaseInitializer {
 				CREATE VIEW user_identifiers AS
 				SELECT id, username
 				FROM "User";
+								
+				CREATE OR REPLACE FUNCTION get_user_by_credentials(
+				    p_username VARCHAR(50),
+				    p_password VARCHAR(50)
+				)
+				RETURNS TABLE(
+				    id INT,
+				    fname VARCHAR(50),
+				    lname VARCHAR(50),
+				    username VARCHAR(50),
+				    age INT,
+				    created_at TIMESTAMP
+				) AS $$
+				BEGIN
+				    RETURN QUERY
+				    SELECT u.id, u.fname, u.lname, u.username, u.age, u.created_at
+				    FROM "User" u
+				    WHERE u.username = p_username
+				      AND u.password = p_password;
+				END;
+				$$ LANGUAGE plpgsql;
+
 			""";
 			stmt.execute(createTables);
 			System.out.println("Tables created successfully!.");
@@ -288,18 +313,23 @@ public class DatabaseInitializer {
 		lobbyDAO.createLobby(defaultLobby);
 
 		InvitationDAO invitationDAO = new InvitationDAO(connection);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[1]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[2]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[3]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[4]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[5]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[6]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[7]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[8]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[9]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[10]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[11]);
-		invitationDAO.sendInvitation(users[0], defaultLobby, users[12]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[1]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[2]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[3]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[4]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[5]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[6]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[7]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[8]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[9]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[10]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[11]);
+		invitationDAO.sendInvitation(users[10], defaultLobby, users[12]);
+		invitationDAO.sendInvitation(users[1], defaultLobby, users[10]);
+		invitationDAO.sendInvitation(users[2], defaultLobby, users[10]);
+		invitationDAO.sendInvitation(users[3], defaultLobby, users[10]);
+		invitationDAO.sendInvitation(users[4], defaultLobby, users[10]);
+		invitationDAO.sendInvitation(users[5], defaultLobby, users[10]);
 
 		// TODO: add a trailers
 		String trailerPath = null;
