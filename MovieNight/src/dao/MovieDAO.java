@@ -59,7 +59,7 @@ public class MovieDAO extends AbstractDAO<Movie> {
         return update(updateQuery, fname, lname, userId);
     }
     
-    public List<Movie> findMoviesByGenres(int[] genreIds) {
+    public List<Movie> findMoviesByGenres(Integer[] genreIds) {
         List<Movie> movies = new ArrayList<>();
         String query = "SELECT * FROM get_movies_by_all_genres(?)";
 

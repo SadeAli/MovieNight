@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.Timer;
@@ -41,6 +42,9 @@ public class LobbyPanel extends javax.swing.JPanel {
     private String selectedMovie = "";
     private int selectedMovieId = 0;
     private Boolean searchEmpty = true;
+    
+    private int genreIndex = 0;
+    private String genreName = "";
     
     private ArrayList<Integer> votes = new ArrayList<>();
     private final SharedUserModel sharedUserModel;
@@ -117,7 +121,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         suggestionMovieIds = db.getSuggestedMovieIds(ownerUser);
         suggestionsList.setModel(suggestionsModel);
     }
-    
+
     private void loadVotes() {
     	votes = db.getVoteMovieIdsOfUser(ownerUser, loggedUser);
     	System.out.println(votes);
@@ -151,13 +155,29 @@ public class LobbyPanel extends javax.swing.JPanel {
         }
     }
     
+    private ArrayList<String> parseGenreField() {
+    	String[] splittedGenres = genreField.getText().split(" ");
+    	ArrayList<String> parsedGenres = new ArrayList<>();
+    	for (String p : splittedGenres) {
+    		if (!p.isBlank()) {
+    			parsedGenres.add(p);
+    		}
+    	}
+    	return parsedGenres;
+    }
+    
     private void search(String input) {
         moviesModel.removeAllElements();
         moviesModel.addAll(movies.values());
+    	ArrayList<Integer> genreMovieIds = db.findMovieIdsByGenres(parseGenreField());
+
         for (Integer movieId : movies.keySet()) {
-        	// check genre, actor etc. too!
-        	// then remove them.
         	String title = movies.get(movieId);
+
+        	if (!genreMovieIds.isEmpty() && !genreMovieIds.contains(movieId)) {
+        		moviesModel.removeElement(title);
+        	}
+        	
             if (!title.contains(input)) {
                 moviesModel.removeElement(title);
             }
@@ -252,6 +272,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         searchMovieField = new javax.swing.JTextField();
         moviesScrollPanel = new javax.swing.JScrollPane();
         moviesList = new javax.swing.JList<>();
+        genreField = new javax.swing.JTextField();
         usersInLobbyPanel = new javax.swing.JPanel();
         usersScrollPanel = new javax.swing.JScrollPane();
         usersInLobbyList = new javax.swing.JList<>();
@@ -300,15 +321,18 @@ public class LobbyPanel extends javax.swing.JPanel {
         });
         moviesScrollPanel.setViewportView(moviesList);
 
+        genreField.setText("jTextField1");
+
         javax.swing.GroupLayout moviePanelLayout = new javax.swing.GroupLayout(moviePanel);
         moviePanel.setLayout(moviePanelLayout);
         moviePanelLayout.setHorizontalGroup(
             moviePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, moviePanelLayout.createSequentialGroup()
+            .addGroup(moviePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(moviePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(moviePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(searchMovieField, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(moviesScrollPanel)
-                    .addComponent(searchMovieField))
+                    .addComponent(genreField))
                 .addContainerGap())
         );
         moviePanelLayout.setVerticalGroup(
@@ -316,7 +340,9 @@ public class LobbyPanel extends javax.swing.JPanel {
             .addGroup(moviePanelLayout.createSequentialGroup()
                 .addComponent(searchMovieField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(moviesScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
+                .addComponent(genreField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(moviesScrollPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -448,7 +474,7 @@ public class LobbyPanel extends javax.swing.JPanel {
                 .addComponent(suggestButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(voteButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 238, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 378, Short.MAX_VALUE)
                 .addComponent(voteStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(backToHomeButton)
@@ -489,7 +515,7 @@ public class LobbyPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(moviePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -598,6 +624,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private javax.swing.JButton backToHomeButton;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
+    private javax.swing.JTextField genreField;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel movieInfoPanel;

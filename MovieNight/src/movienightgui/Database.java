@@ -2,6 +2,7 @@ package movienightgui;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -18,6 +19,7 @@ public class Database {
 	private SuggestionDAO suggestionDAO;
 	private VoteDAO voteDAO;
 	private LobbyDAO lobbyDAO;
+	private GenreDAO genreDAO;
 	
 	public Database(Connection connection) {
 		this.userDAO = new UserDAO(connection);
@@ -27,6 +29,7 @@ public class Database {
 		this.suggestionDAO = new SuggestionDAO(connection);
 		this.voteDAO = new VoteDAO(connection);
 		this.lobbyDAO = new LobbyDAO(connection);
+		this.genreDAO = new GenreDAO(connection);
 	}
 	
 	public void removeVotesForMovie(String ownerUser, int movieId) {
@@ -440,5 +443,29 @@ public class Database {
 	public void updatePassword(String username, String newPassword) {
 		int userId = userDAO.findByUsername(username).getId();
 		userDAO.updateUserPassword(userId, newPassword);
+	}
+	
+	public ArrayList<String> getGenres() {
+		ArrayList<String> genres = new ArrayList<>();
+		for (Genre g : genreDAO.findAll()) {
+			genres.add(g.getName());
+		}
+		return genres;
+	}
+	
+	public ArrayList<Integer> findMovieIdsByGenres(ArrayList<String> genres) {
+		ArrayList<Integer> genreIds = new ArrayList<>();
+		for (String genreName : genres) {
+			Genre g = genreDAO.getGenre(genreName);
+			if (g != null) {
+				genreIds.add(g.getId());
+			}
+		}
+		ArrayList<Movie> movies = (ArrayList<Movie>) movieDAO.findMoviesByGenres(genreIds.toArray(new Integer[0]));
+		ArrayList<Integer> movieIds = new ArrayList<>();
+		for (Movie m : movies) {
+			movieIds.add(m.getId());
+		}
+		return movieIds;
 	}
 }
