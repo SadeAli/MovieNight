@@ -66,19 +66,19 @@ public class UserDAO extends AbstractDAO<User> {
         return update(updateQuery, password, userId);
     }
     
-    public User getUserByCredentials(String username, String password) {
+    public boolean getUserByCredentials(String username, String password) {
         String query = "SELECT * FROM get_user_by_credentials(?, ?)";
         try (PreparedStatement stmt = getConnection().prepareStatement(query)) {
             stmt.setString(1, username);
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return mapResultSetToEntity(rs);
+                return true;
             }
         } catch (SQLException e) {
             System.err.println("getUserByCredentials error: " + e.getMessage());
         }
-        return null;
+        return false;
     }
 
     public List<String> findAllUsername() {

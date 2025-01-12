@@ -53,11 +53,7 @@ public class Database {
 	
 	
 	public boolean validateLogin(String username, String password) {
-		User user = userDAO.findByUsername(username);
-		if (user instanceof User && user.getPassword().equals(password)) {
-			return true;
-		}
-		return false;
+		return userDAO.getUserByCredentials(username, password);
 	}
 
 	
