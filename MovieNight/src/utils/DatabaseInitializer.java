@@ -119,7 +119,7 @@ public class DatabaseInitializer {
 				        temp_movie_title TEXT,
 				        temp_vote_count INT
 				    ) ON COMMIT DROP;
-				
+
 				    -- Loop over movies in the given lobby
 				    OPEN movie_cursor;
 				    LOOP
@@ -129,6 +129,7 @@ public class DatabaseInitializer {
 				        -- Count votes for the current movie
 				        SELECT COUNT(*) INTO movie_vote_count
 				        FROM vote
+
 				        WHERE vote.movie_id = movie_record.id AND vote.lobby_id = param_lobby_id;
 				
 				        -- Insert the movie and its vote count into the temporary table
@@ -146,9 +147,6 @@ public class DatabaseInitializer {
 				    RETURN;
 				END;
 				$$ LANGUAGE plpgsql;
-
-
-
 
 				CREATE OR REPLACE FUNCTION get_movies_by_all_genres(given_genre_ids INT[])
 				RETURNS TABLE(id INT, title VARCHAR(100), description TEXT, trailerPath VARCHAR(200)) AS $$
@@ -177,7 +175,6 @@ public class DatabaseInitializer {
 				    ) > 0;
 				END;
 				$$ LANGUAGE plpgsql;
-
 				
 				CREATE OR REPLACE FUNCTION prevent_unsuggest_if_voted()
 				RETURNS TRIGGER AS $$

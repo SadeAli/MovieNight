@@ -59,12 +59,13 @@ public class ResultPanel extends javax.swing.JPanel {
         String username = sharedUserModel.getUsername();
         String ownerUser = db.getBelongingLobbyOwner(username);
         if (username != null && ownerUser != null && username.equals(ownerUser)) {
-        	db.emptyLobby(ownerUser);
+        	// db.emptyLobby(ownerUser); TODO USERS LEAVE THE LOBBY
         	db.emptyInvitations(ownerUser);
         	db.emptySuggestions(ownerUser);
         	db.emptyVotes(ownerUser);
-        	db.deleteLobby(ownerUser);
+        	// db.deleteLobby(ownerUser); TODO DELETE LOBBY BY TRIGGER
         } 
+        db.removeUserFromLobby(ownerUser, username);
     }
 
     private void showHome() {
