@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import dao.*;
+import dao.LobbyDAO.VoteResult;
 import models.*;
 
 public class Database {
@@ -483,5 +484,10 @@ public class Database {
 	
 	public String getDescription(int movieId) {
 		return movieDAO.findById(movieId).getDescription();
+	}
+	
+	public VoteResult[] getWinnerMovies(String ownerUser) {
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		return lobbyDAO.getWinningMoviesByVotes(lobbyId);
 	}
 }

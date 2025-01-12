@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
+
+import dao.LobbyDAO.VoteResult;
 import movienightgui.HomePanel;
 
 /**
@@ -36,24 +38,17 @@ public class ResultPanel extends javax.swing.JPanel {
     }
     
     public void init() {
-        lobbyVotes = db.getVotes2(sharedUserModel.getLobby());
-        ArrayList<Integer> lobbyResults = new ArrayList<>(lobbyVotes.keySet());
-        lobbyResults.sort(
-                ((m1, m2) -> Integer.compare(lobbyVotes.get(m2), lobbyVotes.get(m1)))
-        );
+        db.getWinnerMovies(sharedUserModel.getLobby());
         
         DefaultListModel<String> model = new DefaultListModel<>();
         jList1.setModel(model);
-        for (int i = 0; i < lobbyResults.size(); i++) {
-            model.addElement(
-                    String.format("%d - %s (%d)", i+1, 
-                    db.getMovieTitle(lobbyResults.get(i)), 
-                    lobbyVotes.get(lobbyResults.get(i))
-            ));
+        for (VoteResult v : db.getWinnerMovies(sharedUserModel.getLobby())) {
+        	model.addElement(v.movieTitle + ", " + v.voteCount + " votes");
         }
         
-        if (lobbyResults.size() > 0) {
-            jLabel1.setText("Movie: " + db.getMovieTitle(lobbyResults.getFirst()));
+        
+        if (model.size() > 0) {
+            jLabel1.setText("Movie: " + model.getElementAt(0));
         }
         
         String username = sharedUserModel.getUsername();
