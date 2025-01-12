@@ -42,6 +42,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private String selectedMovie = "";
     private int selectedMovieId = 0;
     private Boolean searchEmpty = true;
+    private ArrayList<Integer> searchedMovies = new ArrayList<>();
     
     private int genreIndex = 0;
     private String genreName = "";
@@ -50,7 +51,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private final SharedUserModel sharedUserModel;
     private final JFrame parentFrame;
         
-    private final int DELAY = 10;
+    private final int DELAY = 1000;
     private final int READYWAITSECONDS = 1;
     private int readyWaitCounter = 0;
     private Timer timer;
@@ -62,7 +63,9 @@ public class LobbyPanel extends javax.swing.JPanel {
         initComponents();
         this.db = db;
         this.sharedUserModel = sharedUserModel;
-        this.parentFrame = parentFrame;        
+        this.parentFrame = parentFrame;      
+        descriptionTextArea.setLineWrap(true);
+        descriptionTextArea.setWrapStyleWord(true);
     }
     
     private static <K, V> Map<K, V> zipToMap(List<K> keys, List<V> values) {
@@ -90,6 +93,10 @@ public class LobbyPanel extends javax.swing.JPanel {
         } else {
         	readyButton.setEnabled(true);
         }
+        
+        if (!db.isLobbyStillVoting(ownerUser)) {
+        	showResults();
+        }
     }
     
     private void showHome() {
@@ -107,6 +114,8 @@ public class LobbyPanel extends javax.swing.JPanel {
         moviesModel.removeAllElements();
         moviesModel.addAll(movies.values());
         moviesList.setModel(moviesModel);
+        
+        searchedMovies.addAll(movies.keySet());
     }
     
     private void loadLobbyUsers() {
@@ -132,6 +141,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         
     	movieGenresLabel.setText(db.getMovieGenresLabel(selectedMovieId));
         movieName.setText(selectedMovie);
+        descriptionTextArea.setText(db.getDescription(selectedMovieId));
         
         if (suggestionMovieIds.contains(selectedMovieId)) {
             voteButton.setEnabled(true);
@@ -170,6 +180,7 @@ public class LobbyPanel extends javax.swing.JPanel {
     private void search(String input) {
         moviesModel.removeAllElements();
         moviesModel.addAll(movies.values());
+        searchedMovies.clear();
     	ArrayList<Integer> genreMovieIds = db.findMovieIdsByGenres(parseGenreField());
 
         for (Integer movieId : movies.keySet()) {
@@ -177,11 +188,15 @@ public class LobbyPanel extends javax.swing.JPanel {
 
         	if (!genreMovieIds.isEmpty() && !genreMovieIds.contains(movieId)) {
         		moviesModel.removeElement(title);
-        	}
-        	
-            if (!title.contains(input)) {
+        	} 
+
+        	if (!title.contains(input)) {
                 moviesModel.removeElement(title);
             }
+        	
+        	if (moviesModel.contains(title)) {
+            	searchedMovies.add(movieId);
+        	}
         }
     }
     
@@ -219,18 +234,19 @@ public class LobbyPanel extends javax.swing.JPanel {
         searchEmpty = true;
         searchMovieField.setText("Search movie...");
         searchMovieField.setForeground(Color.GRAY);
+        genreField.setText("");
     }
     
     private void initDatabaseAccessTimer() {
         ActionListener listener = (ActionEvent e) -> {
             int userSelectedIndex = usersInLobbyList.getSelectedIndex();
             
-            loadLobbyUsers();
-            loadSuggestions();
-            loadVotes();
-            showSelectedMovieInfo();
-            
-            usersInLobbyList.isSelectedIndex(userSelectedIndex);
+//            loadLobbyUsers();
+//            loadSuggestions();
+//            loadVotes();
+//            showSelectedMovieInfo();
+//            
+//            usersInLobbyList.isSelectedIndex(userSelectedIndex);
             
             if (!db.isLobbyStillVoting(ownerUser)) {
                 if (READYWAITSECONDS * 1000 / DELAY >= readyWaitCounter) {
@@ -239,13 +255,13 @@ public class LobbyPanel extends javax.swing.JPanel {
                     );
                     readyWaitCounter += 1;
                 } else {
-                    showResults();
-                    timer.stop();
+                    this.timer.stop();
                 }
             } 
+            System.out.println("AAAA");
         };
-        this.timer = new Timer(DELAY, listener);
-        this.timer.start();
+//        this.timer = new Timer(DELAY, listener);
+//        this.timer.start();
     }
     
     private void showResults() {
@@ -291,6 +307,8 @@ public class LobbyPanel extends javax.swing.JPanel {
         backToHomeButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         movieGenresLabel = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        descriptionTextArea = new javax.swing.JTextArea();
         refreshButton = new javax.swing.JButton();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
@@ -450,6 +468,11 @@ public class LobbyPanel extends javax.swing.JPanel {
 
         movieGenresLabel.setText("jLabel2");
 
+        descriptionTextArea.setColumns(20);
+        descriptionTextArea.setRows(5);
+        descriptionTextArea.setFocusable(false);
+        jScrollPane2.setViewportView(descriptionTextArea);
+
         javax.swing.GroupLayout movieInfoPanelLayout = new javax.swing.GroupLayout(movieInfoPanel);
         movieInfoPanel.setLayout(movieInfoPanelLayout);
         movieInfoPanelLayout.setHorizontalGroup(
@@ -457,23 +480,27 @@ public class LobbyPanel extends javax.swing.JPanel {
             .addGroup(movieInfoPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(voteStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(movieInfoPanelLayout.createSequentialGroup()
-                        .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(backToHomeButton)
-                            .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(suggestButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(voteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(movieInfoPanelLayout.createSequentialGroup()
                         .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(movieNameLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(suggestButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(voteButton, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(movieInfoPanelLayout.createSequentialGroup()
                         .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(movieName, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
-                            .addComponent(movieGenresLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap())
+                            .addComponent(jScrollPane2)
+                            .addGroup(movieInfoPanelLayout.createSequentialGroup()
+                                .addComponent(backToHomeButton)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(voteStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(movieInfoPanelLayout.createSequentialGroup()
+                                .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(movieNameLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(movieName, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
+                                    .addComponent(movieGenresLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap())))
         );
         movieInfoPanelLayout.setVerticalGroup(
             movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -485,11 +512,13 @@ public class LobbyPanel extends javax.swing.JPanel {
                 .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(movieGenresLabel))
-                .addGap(91, 91, 91)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(suggestButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(voteButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 282, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 275, Short.MAX_VALUE)
                 .addComponent(voteStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(backToHomeButton)
@@ -571,7 +600,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
         if (moviesList.getSelectedValue() != null) {
             selectedMovie = moviesList.getSelectedValue();
-            selectedMovieId = new ArrayList<Integer>(movies.keySet()).get(moviesList.getSelectedIndex());
+            selectedMovieId = searchedMovies.get(moviesList.getSelectedIndex());
             showSelectedMovieInfo();
         }
     }//GEN-LAST:event_moviesListMouseClicked
@@ -590,6 +619,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         System.out.println(votes);
         db.setLobbyReady(ownerUser);
         readyButton.setEnabled(false);
+        showResults();
         System.out.println("ready then?");
     }//GEN-LAST:event_readyButtonActionPerformed
 
@@ -601,11 +631,17 @@ public class LobbyPanel extends javax.swing.JPanel {
             voteButton.setEnabled(true);
             db.suggestMovie(ownerUser, loggedUser, movieId);
         } else {
-            suggestionsModel.removeElement(selectedMovie);
-            voteButton.setEnabled(false);
             db.removeSuggestion(ownerUser, movieId);
-            db.removeVotesForMovie(ownerUser, movieId);
+            if (db.getSuggestedMovieIds(ownerUser).contains(movieId)) {
+            	// That means TRIGGER prevented deletion as there are users already voted this movie...
+            	voteStatusLabel.setText("Suggestion cannot be removed; other users have voted.");
+            	suggestButton.setSelected(true);
+            } else {
+                suggestionsModel.removeElement(selectedMovie);
+                voteButton.setEnabled(false);
+            }
         }
+        loadSuggestions();
         System.out.println(suggestionsModel);
     }//GEN-LAST:event_suggestButtonActionPerformed
 
@@ -618,6 +654,8 @@ public class LobbyPanel extends javax.swing.JPanel {
             suggestButton.setEnabled(true);
             db.removeVote(loggedUser, ownerUser, findIdOfSelectedMovie());
         }
+        loadSuggestions();
+        loadVotes();
         System.out.println(votes);
     }//GEN-LAST:event_voteButtonActionPerformed
 
@@ -637,12 +675,14 @@ public class LobbyPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backToHomeButton;
+    private javax.swing.JTextArea descriptionTextArea;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
     private javax.swing.JTextField genreField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel movieGenresLabel;
     private javax.swing.JPanel movieInfoPanel;
     private javax.swing.JLabel movieName;

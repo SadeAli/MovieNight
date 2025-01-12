@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import dao.*;
+import dao.LobbyDAO.VoteResult;
 import models.*;
 
 public class Database {
@@ -67,13 +68,8 @@ public class Database {
 
 	
 	public ArrayList<String> getUsers() {
-		ArrayList<String> usernames = new ArrayList<>();
-		for (User user : userDAO.findAll()) {
-			usernames.add(user.getUsername());
-		}
-		return usernames;
+		return (ArrayList<String>) userDAO.findAllUsername();
 	}
-
 	
 	public ArrayList<String> getInvitiationsForUser(String username) {
 		int receiverId = userDAO.findByUsername(username).getId();
@@ -270,9 +266,13 @@ public class Database {
 
 	
 	public String getBelongingLobbyOwner(String user) {
-		int userId = userDAO.findByUsername(user).getId();
-		int ownerId = inLobbyDAO.findByUserId(userId).getLobbyId();
-		return userDAO.findById(ownerId).getUsername();
+		try {
+			int userId = userDAO.findByUsername(user).getId();
+			int ownerId = inLobbyDAO.findByUserId(userId).getLobbyId();
+			return userDAO.findById(ownerId).getUsername();
+		} catch (NullPointerException e) {
+			return null;
+		}
 	}
 
 	
@@ -463,11 +463,13 @@ public class Database {
 				genreIds.add(g.getId());
 			}
 		}
-		ArrayList<Movie> movies = (ArrayList<Movie>) movieDAO.findMoviesByGenres(genreIds.toArray(new Integer[0]));
+		int[] genreIdsArray = genreIds.stream().mapToInt(Integer::intValue).toArray();
+		ArrayList<Movie> movies = (ArrayList<Movie>) movieDAO.findMoviesByGenres(genreIdsArray);
 		ArrayList<Integer> movieIds = new ArrayList<>();
 		for (Movie m : movies) {
 			movieIds.add(m.getId());
 		}
+		System.out.println(movieIds);
 		return movieIds;
 	}
 	
@@ -477,5 +479,15 @@ public class Database {
 			label += genreDAO.findById(g.getGenreId()).getName() + ", ";
 		}
 		return label;
+	}
+	
+	public String getDescription(int movieId) {
+		return movieDAO.findById(movieId).getDescription();
+	}
+	
+	public VoteResult[] getWinnerMovies(String ownerUser) {
+		System.out.println("aaa " + ownerUser + " " + userDAO.findByUsername(ownerUser));
+		int lobbyId = userDAO.findByUsername(ownerUser).getId();
+		return lobbyDAO.getWinningMoviesByVotes(lobbyId);
 	}
 }
