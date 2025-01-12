@@ -150,30 +150,33 @@ public class DatabaseInitializer {
 				$$ LANGUAGE plpgsql;
 				
 				CREATE OR REPLACE FUNCTION get_movies_by_all_genres(given_genre_ids INT[])
-				RETURNS TABLE(id INT, title TEXT, description TEXT, trailer_path TEXT) AS $$
+				RETURNS TABLE(id INT, title VARCHAR(100), description TEXT, trailerPath VARCHAR(200)) AS $$
 				BEGIN
 				    RETURN QUERY
-				    -- Select all movies where their genres intersect with the given genres
-				    SELECT m.id, m.title, m.description, m.trailer_path
+				    SELECT m.id, m.title, m.description, m.trailerPath
 				    FROM movie m
-				    WHERE EXISTS (
-				        -- Find the intersection of the movie's genres and the given genres
-				        SELECT 1
+				    WHERE NOT EXISTS (
+				        -- Ensure that there are no genres in the given list that do not intersect with the movie's genres
+				        SELECT unnest(given_genre_ids)
+				        EXCEPT
+				        SELECT hg.genre_id
 				        FROM hasgenre hg
 				        WHERE hg.movie_id = m.id
-				        INTERSECT
-				        SELECT unnest(given_genre_ids)
 				    )
 				    AND (
-				        -- Ensure the movie contains all the given genres
-				        SELECT COUNT(DISTINCT genre_id)
-				        FROM hasgenre hg
-				        WHERE hg.movie_id = m.id
-				        INTERSECT
-				        SELECT unnest(given_genre_ids)
-				    ) = array_length(given_genre_ids, 1);
+				        -- Ensure the movie has at least one genre from the given list
+				        SELECT COUNT(*) 
+				        FROM (
+				            SELECT unnest(given_genre_ids)
+				            INTERSECT
+				            SELECT hg.genre_id
+				            FROM hasgenre hg
+				            WHERE hg.movie_id = m.id
+				        ) AS matched_genres
+				    ) > 0;
 				END;
 				$$ LANGUAGE plpgsql;
+
 				
 				CREATE OR REPLACE FUNCTION prevent_unsuggest_if_voted()
 				RETURNS TRIGGER AS $$
