@@ -237,12 +237,12 @@ public class LobbyPanel extends javax.swing.JPanel {
         ActionListener listener = (ActionEvent e) -> {
             int userSelectedIndex = usersInLobbyList.getSelectedIndex();
             
-            loadLobbyUsers();
-            loadSuggestions();
-            loadVotes();
-            showSelectedMovieInfo();
-            
-            usersInLobbyList.isSelectedIndex(userSelectedIndex);
+//            loadLobbyUsers();
+//            loadSuggestions();
+//            loadVotes();
+//            showSelectedMovieInfo();
+//            
+//            usersInLobbyList.isSelectedIndex(userSelectedIndex);
             
             if (!db.isLobbyStillVoting(ownerUser)) {
                 if (READYWAITSECONDS * 1000 / DELAY >= readyWaitCounter) {
@@ -631,6 +631,7 @@ public class LobbyPanel extends javax.swing.JPanel {
             db.removeSuggestion(ownerUser, movieId);
             db.removeVotesForMovie(ownerUser, movieId);
         }
+        loadSuggestions();
         System.out.println(suggestionsModel);
     }//GEN-LAST:event_suggestButtonActionPerformed
 
