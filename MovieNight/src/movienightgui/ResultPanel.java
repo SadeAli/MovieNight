@@ -38,11 +38,13 @@ public class ResultPanel extends javax.swing.JPanel {
     }
     
     public void init() {
-        db.getWinnerMovies(sharedUserModel.getLobby());
+        String username = sharedUserModel.getUsername();
+        System.out.println(username);
+    	String ownerUser = db.getBelongingLobbyOwner(username);
         
         DefaultListModel<String> model = new DefaultListModel<>();
         jList1.setModel(model);
-        for (VoteResult v : db.getWinnerMovies(sharedUserModel.getLobby())) {
+        for (VoteResult v : db.getWinnerMovies(ownerUser)) {
         	model.addElement(v.movieTitle + ", " + v.voteCount + " votes");
         }
         
@@ -51,16 +53,10 @@ public class ResultPanel extends javax.swing.JPanel {
             jLabel1.setText("Movie: " + model.getElementAt(0));
         }
         
-        String username = sharedUserModel.getUsername();
-        String ownerUser = db.getBelongingLobbyOwner(username);
         if (username != null && ownerUser != null && username.equals(ownerUser)) {
         	// db.emptyLobby(ownerUser); TODO USERS LEAVE THE LOBBY
         	db.emptyInvitations(ownerUser);
-        	db.emptySuggestions(ownerUser);
-        	db.emptyVotes(ownerUser);
-        	// db.deleteLobby(ownerUser); TODO DELETE LOBBY BY TRIGGER
         } 
-        db.removeUserFromLobby(ownerUser, username);
     }
 
     private void showHome() {
@@ -137,6 +133,9 @@ public class ResultPanel extends javax.swing.JPanel {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        String username = sharedUserModel.getUsername();
+    	String ownerUser = db.getBelongingLobbyOwner(username);
+        db.removeUserFromLobby(ownerUser, username);
         showHome();
     }//GEN-LAST:event_jButton1ActionPerformed
 

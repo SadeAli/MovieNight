@@ -266,9 +266,13 @@ public class Database {
 
 	
 	public String getBelongingLobbyOwner(String user) {
-		int userId = userDAO.findByUsername(user).getId();
-		int ownerId = inLobbyDAO.findByUserId(userId).getLobbyId();
-		return userDAO.findById(ownerId).getUsername();
+		try {
+			int userId = userDAO.findByUsername(user).getId();
+			int ownerId = inLobbyDAO.findByUserId(userId).getLobbyId();
+			return userDAO.findById(ownerId).getUsername();
+		} catch (NullPointerException e) {
+			return null;
+		}
 	}
 
 	
@@ -482,6 +486,7 @@ public class Database {
 	}
 	
 	public VoteResult[] getWinnerMovies(String ownerUser) {
+		System.out.println("aaa " + ownerUser + " " + userDAO.findByUsername(ownerUser));
 		int lobbyId = userDAO.findByUsername(ownerUser).getId();
 		return lobbyDAO.getWinningMoviesByVotes(lobbyId);
 	}

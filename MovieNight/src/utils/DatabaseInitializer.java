@@ -209,9 +209,15 @@ public class DatabaseInitializer {
 				        FROM inlobby
 				        WHERE lobby_id = OLD.lobby_id
 				    ) THEN
-				        -- Delete the lobby if no users are left
+				        -- Delete votes and suggestions if no users are left
+				        DELETE FROM vote
+				        WHERE lobby_id = OLD.lobby_id;				        
+				        DELETE FROM suggestion
+				        WHERE lobby_id = OLD.lobby_id;
+				        
+				        -- Then delete the lobby
 				        DELETE FROM lobby
-				        WHERE id = OLD.lobby_id;
+				        WHERE id = OLD.lobby_id;				        
 				    END IF;
 				
 				    -- Return the OLD row (not used, but required for the trigger)

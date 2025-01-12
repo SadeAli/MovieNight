@@ -93,6 +93,10 @@ public class LobbyPanel extends javax.swing.JPanel {
         } else {
         	readyButton.setEnabled(true);
         }
+        
+        if (!db.isLobbyStillVoting(ownerUser)) {
+        	showResults();
+        }
     }
     
     private void showHome() {
@@ -251,13 +255,13 @@ public class LobbyPanel extends javax.swing.JPanel {
                     );
                     readyWaitCounter += 1;
                 } else {
-                    showResults();
-                    timer.stop();
+                    this.timer.stop();
                 }
             } 
+            System.out.println("AAAA");
         };
-        this.timer = new Timer(DELAY, listener);
-        this.timer.start();
+//        this.timer = new Timer(DELAY, listener);
+//        this.timer.start();
     }
     
     private void showResults() {
@@ -615,6 +619,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         System.out.println(votes);
         db.setLobbyReady(ownerUser);
         readyButton.setEnabled(false);
+        showResults();
         System.out.println("ready then?");
     }//GEN-LAST:event_readyButtonActionPerformed
 

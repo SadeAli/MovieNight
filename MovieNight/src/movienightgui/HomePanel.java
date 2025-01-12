@@ -38,6 +38,7 @@ public class HomePanel extends javax.swing.JPanel {
     private int numOfInvited = 0;
     
     private Boolean isCreatingNewLobby = false;
+    private Boolean isAlreadyInLobby = false;
     
     private SharedUserModel sharedUserModel;
     private JFrame parentFrame;
@@ -61,9 +62,11 @@ public class HomePanel extends javax.swing.JPanel {
         this.db = db;
         this.sharedUserModel = sharedUserModel;
         this.parentFrame = parentFrame;
+
     }
     
     public void init() {
+        this.usersAndInvitations = new HashMap<>();
         initSearch();
 
         loginAs(sharedUserModel.getUsername());
@@ -72,6 +75,25 @@ public class HomePanel extends javax.swing.JPanel {
         this.acceptedInvitation = null;
 
         userInviteCancelButton.setEnabled(false);
+        isAlreadyInLobby = false;
+        
+    	usersList.setEnabled(true);
+    	invitationsList.setEnabled(true);
+    	refreshButton.setEnabled(true);
+        
+        // Is user in a lobby right now?
+        if (db.getBelongingLobbyOwner(loggedUser) != null) {
+        	System.out.println("Belongs to lobby: " + db.getBelongingLobbyOwner(loggedUser));
+        	usersList.setEnabled(false);
+        	invitationsList.setEnabled(false);
+        	refreshButton.setEnabled(false);
+        	
+        	invitationAcceptButton.setEnabled(true);
+        	invitationAcceptButton.setText("Return back to lobby!");
+        	invitationAcceptButton.setForeground(Color.RED);
+        
+        	isAlreadyInLobby = true;
+        }
     }
     
     private void initSearch() {
@@ -439,6 +461,9 @@ public class HomePanel extends javax.swing.JPanel {
             }
             db.addUserToLobby(acceptedInvitation, loggedUser);
             showLobby();
+        }
+        if (isAlreadyInLobby) {
+        	showLobby();
         }
     }//GEN-LAST:event_invitationAcceptButtonActionPerformed
 
