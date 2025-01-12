@@ -98,8 +98,8 @@ public class DatabaseInitializer {
 					PRIMARY KEY (sender_id, receiver_id, lobby_id)
 				);
 				
-				-- A function to list the winner movies in a lobby
-				CREATE OR REPLACE FUNCTION get_winning_movies_by_votes(lobby_id INT)
+				
+				CREATE OR REPLACE FUNCTION get_winning_movies_by_votes(param_lobby_id INT)
 				RETURNS TABLE(movie_id INT, movie_title TEXT, vote_count INT) AS $$
 				DECLARE
 				    movie_record RECORD;
@@ -110,15 +110,16 @@ public class DatabaseInitializer {
 				        WHERE EXISTS (
 				            SELECT 1
 				            FROM vote v
-				            WHERE v.movie_id = m.id AND v.lobby_id = lobby_id
+				            WHERE v.movie_id = m.id AND v.lobby_id = param_lobby_id
 				        );
 				BEGIN
-				    -- Initialize an array to hold movie results
+				    -- Create a temporary table to hold the results
 				    CREATE TEMP TABLE movie_votes_temp (
-				        movie_title TEXT,
-				        vote_count INT
-				    );
-				
+				        temp_movie_id INT,
+				        temp_movie_title TEXT,
+				        temp_vote_count INT
+				    ) ON COMMIT DROP;
+
 				    -- Loop over movies in the given lobby
 				    OPEN movie_cursor;
 				    LOOP
@@ -128,50 +129,50 @@ public class DatabaseInitializer {
 				        -- Count votes for the current movie
 				        SELECT COUNT(*) INTO movie_vote_count
 				        FROM vote
-				        WHERE movie_id = movie_record.id AND lobby_id = lobby_id;
+
+				        WHERE vote.movie_id = movie_record.id AND vote.lobby_id = param_lobby_id;
 				
-				        -- Insert movie and its vote count into the temporary table
-				        INSERT INTO movie_votes_temp (movie_title, vote_count)
-				        VALUES (movie_record.title, movie_vote_count);
+				        -- Insert the movie and its vote count into the temporary table
+				        INSERT INTO movie_votes_temp (temp_movie_id, temp_movie_title, temp_vote_count)
+				        VALUES (movie_record.id, movie_record.title, movie_vote_count);
 				    END LOOP;
 				    CLOSE movie_cursor;
 				
-				    -- Select the result from the temporary table, ensuring the movie has at least 1 vote
+				    -- Return the results from the temporary table, ensuring the movie has at least 1 vote
 				    RETURN QUERY
-				    SELECT movie_id, movie_title, vote_count
+				    SELECT temp_movie_id AS movie_id, temp_movie_title AS movie_title, temp_vote_count AS vote_count
 				    FROM movie_votes_temp
-				    HAVING vote_count > 0;
-				
-				    -- Clean up temporary table
-				    DROP TABLE movie_votes_temp;
+				    WHERE temp_vote_count > 0;
 				
 				    RETURN;
 				END;
 				$$ LANGUAGE plpgsql;
-				
+
 				CREATE OR REPLACE FUNCTION get_movies_by_all_genres(given_genre_ids INT[])
-				RETURNS TABLE(id INT, title TEXT, description TEXT, trailer_path TEXT) AS $$
+				RETURNS TABLE(id INT, title VARCHAR(100), description TEXT, trailerPath VARCHAR(200)) AS $$
 				BEGIN
 				    RETURN QUERY
-				    -- Select all movies where their genres intersect with the given genres
-				    SELECT m.id, m.title, m.description, m.trailer_path
+				    SELECT m.id, m.title, m.description, m.trailerPath
 				    FROM movie m
-				    WHERE EXISTS (
-				        -- Find the intersection of the movie's genres and the given genres
-				        SELECT 1
+				    WHERE NOT EXISTS (
+				        -- Ensure that there are no genres in the given list that do not intersect with the movie's genres
+				        SELECT unnest(given_genre_ids)
+				        EXCEPT
+				        SELECT hg.genre_id
 				        FROM hasgenre hg
 				        WHERE hg.movie_id = m.id
-				        INTERSECT
-				        SELECT unnest(given_genre_ids)
 				    )
 				    AND (
-				        -- Ensure the movie contains all the given genres
-				        SELECT COUNT(DISTINCT genre_id)
-				        FROM hasgenre hg
-				        WHERE hg.movie_id = m.id
-				        INTERSECT
-				        SELECT unnest(given_genre_ids)
-				    ) = array_length(given_genre_ids, 1);
+				        -- Ensure the movie has at least one genre from the given list
+				        SELECT COUNT(*) 
+				        FROM (
+				            SELECT unnest(given_genre_ids)
+				            INTERSECT
+				            SELECT hg.genre_id
+				            FROM hasgenre hg
+				            WHERE hg.movie_id = m.id
+				        ) AS matched_genres
+				    ) > 0;
 				END;
 				$$ LANGUAGE plpgsql;
 				
