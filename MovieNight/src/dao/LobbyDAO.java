@@ -64,7 +64,7 @@ public class LobbyDAO extends AbstractDAO<Lobby> {
 	public VoteResult[] getWinningMoviesByVotes(int lobbyID) {
 	    List<VoteResult> results = new ArrayList<>();  // Use a list to dynamically collect results
 
-	    String query = "SELECT get_winning_movies_by_votes(?)";
+	    String query = "SELECT * from get_winning_movies_by_votes(?)";
 	    try (PreparedStatement stmt = connection.prepareStatement(query)) {
 	        stmt.setInt(1, lobbyID);
 	        try (ResultSet rs = stmt.executeQuery()) {

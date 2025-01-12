@@ -226,6 +226,10 @@ public class DatabaseInitializer {
 				AFTER DELETE ON inlobby
 				FOR EACH ROW
 				EXECUTE FUNCTION delete_lobby_when_empty();
+				
+				CREATE VIEW user_identifiers AS
+				SELECT id, username
+				FROM "User";
 			""";
 			stmt.execute(createTables);
 			System.out.println("Tables created successfully!.");
