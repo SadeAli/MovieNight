@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import models.User;
 
@@ -62,5 +64,19 @@ public class UserDAO extends AbstractDAO<User> {
     public boolean updateUserPassword(int userId, String password) {
         String updateQuery = "UPDATE " + getTableName() + " SET password = ? WHERE id = ?";
         return update(updateQuery, password, userId);
+    }
+    
+    public List<String> findAllUsername() {
+        String query = "SELECT * FROM user_identifiers";
+        List<String> results = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                results.add(rs.getString("username"));
+            }
+        } catch (SQLException e) {
+            System.err.println("FindAll error: " + e.getMessage());
+        }
+        return results;
     }
 }

@@ -629,7 +629,7 @@ public class LobbyPanel extends javax.swing.JPanel {
             suggestionsModel.removeElement(selectedMovie);
             voteButton.setEnabled(false);
             db.removeSuggestion(ownerUser, movieId);
-            db.removeVotesForMovie(ownerUser, movieId);
+            db.removeVotesForMovie(ownerUser, movieId);            // Check trigger?
         }
         loadSuggestions();
         System.out.println(suggestionsModel);

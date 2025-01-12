@@ -68,13 +68,8 @@ public class Database {
 
 	
 	public ArrayList<String> getUsers() {
-		ArrayList<String> usernames = new ArrayList<>();
-		for (User user : userDAO.findAll()) {
-			usernames.add(user.getUsername());
-		}
-		return usernames;
+		return (ArrayList<String>) userDAO.findAllUsername();
 	}
-
 	
 	public ArrayList<String> getInvitiationsForUser(String username) {
 		int receiverId = userDAO.findByUsername(username).getId();
