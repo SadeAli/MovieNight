@@ -644,6 +644,8 @@ public class LobbyPanel extends javax.swing.JPanel {
             suggestButton.setEnabled(true);
             db.removeVote(loggedUser, ownerUser, findIdOfSelectedMovie());
         }
+        loadSuggestions();
+        loadVotes();
         System.out.println(votes);
     }//GEN-LAST:event_voteButtonActionPerformed
 
