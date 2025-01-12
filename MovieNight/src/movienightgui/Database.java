@@ -20,6 +20,7 @@ public class Database {
 	private VoteDAO voteDAO;
 	private LobbyDAO lobbyDAO;
 	private GenreDAO genreDAO;
+	private HasGenreDAO hasGenreDAO;
 	
 	public Database(Connection connection) {
 		this.userDAO = new UserDAO(connection);
@@ -30,6 +31,7 @@ public class Database {
 		this.voteDAO = new VoteDAO(connection);
 		this.lobbyDAO = new LobbyDAO(connection);
 		this.genreDAO = new GenreDAO(connection);
+		this.hasGenreDAO = new HasGenreDAO(connection);
 	}
 	
 	public void removeVotesForMovie(String ownerUser, int movieId) {
@@ -467,5 +469,13 @@ public class Database {
 			movieIds.add(m.getId());
 		}
 		return movieIds;
+	}
+	
+	public String getMovieGenresLabel(int movieId) {
+		String label = "";
+		for (HasGenre g : hasGenreDAO.getMovieGenres(movieId)) {
+			label += genreDAO.findById(g.getGenreId()).getName() + ", ";
+		}
+		return label;
 	}
 }
