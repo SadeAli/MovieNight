@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.HasGenre;
+import models.InLobby;
 import models.Movie;
 
 public class MovieDAO extends AbstractDAO<Movie> {
@@ -60,6 +62,7 @@ public class MovieDAO extends AbstractDAO<Movie> {
     }
     
     public List<Movie> findMoviesByGenres(int[] genreIds) {
+
         List<Movie> movies = new ArrayList<>();
         String query = "SELECT * FROM get_movies_by_all_genres(?)";
 
