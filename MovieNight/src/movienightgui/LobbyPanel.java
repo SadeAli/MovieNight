@@ -626,10 +626,15 @@ public class LobbyPanel extends javax.swing.JPanel {
             voteButton.setEnabled(true);
             db.suggestMovie(ownerUser, loggedUser, movieId);
         } else {
-            suggestionsModel.removeElement(selectedMovie);
-            voteButton.setEnabled(false);
             db.removeSuggestion(ownerUser, movieId);
-            db.removeVotesForMovie(ownerUser, movieId);            // Check trigger?
+            if (db.getSuggestedMovieIds(ownerUser).contains(movieId)) {
+            	// That means TRIGGER prevented deletion as there are users already voted this movie...
+            	voteStatusLabel.setText("Suggestion cannot be removed; other users have voted.");
+            	suggestButton.setSelected(true);
+            } else {
+                suggestionsModel.removeElement(selectedMovie);
+                voteButton.setEnabled(false);
+            }
         }
         loadSuggestions();
         System.out.println(suggestionsModel);
