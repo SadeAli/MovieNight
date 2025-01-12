@@ -480,4 +480,8 @@ public class Database {
 		}
 		return label;
 	}
+	
+	public String getDescription(int movieId) {
+		return movieDAO.findById(movieId).getDescription();
+	}
 }

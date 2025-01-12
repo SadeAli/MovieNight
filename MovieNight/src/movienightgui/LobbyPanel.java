@@ -63,7 +63,9 @@ public class LobbyPanel extends javax.swing.JPanel {
         initComponents();
         this.db = db;
         this.sharedUserModel = sharedUserModel;
-        this.parentFrame = parentFrame;        
+        this.parentFrame = parentFrame;      
+        descriptionTextArea.setLineWrap(true);
+        descriptionTextArea.setWrapStyleWord(true);
     }
     
     private static <K, V> Map<K, V> zipToMap(List<K> keys, List<V> values) {
@@ -135,6 +137,7 @@ public class LobbyPanel extends javax.swing.JPanel {
         
     	movieGenresLabel.setText(db.getMovieGenresLabel(selectedMovieId));
         movieName.setText(selectedMovie);
+        descriptionTextArea.setText(db.getDescription(selectedMovieId));
         
         if (suggestionMovieIds.contains(selectedMovieId)) {
             voteButton.setEnabled(true);
@@ -300,6 +303,8 @@ public class LobbyPanel extends javax.swing.JPanel {
         backToHomeButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         movieGenresLabel = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        descriptionTextArea = new javax.swing.JTextArea();
         refreshButton = new javax.swing.JButton();
         filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 32767));
 
@@ -459,6 +464,11 @@ public class LobbyPanel extends javax.swing.JPanel {
 
         movieGenresLabel.setText("jLabel2");
 
+        descriptionTextArea.setColumns(20);
+        descriptionTextArea.setRows(5);
+        descriptionTextArea.setFocusable(false);
+        jScrollPane2.setViewportView(descriptionTextArea);
+
         javax.swing.GroupLayout movieInfoPanelLayout = new javax.swing.GroupLayout(movieInfoPanel);
         movieInfoPanel.setLayout(movieInfoPanelLayout);
         movieInfoPanelLayout.setHorizontalGroup(
@@ -466,23 +476,27 @@ public class LobbyPanel extends javax.swing.JPanel {
             .addGroup(movieInfoPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(voteStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(movieInfoPanelLayout.createSequentialGroup()
-                        .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(backToHomeButton)
-                            .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(suggestButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(voteButton, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(movieInfoPanelLayout.createSequentialGroup()
                         .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(movieNameLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(suggestButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(voteButton, javax.swing.GroupLayout.DEFAULT_SIZE, 135, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(movieInfoPanelLayout.createSequentialGroup()
                         .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(movieName, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
-                            .addComponent(movieGenresLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap())
+                            .addComponent(jScrollPane2)
+                            .addGroup(movieInfoPanelLayout.createSequentialGroup()
+                                .addComponent(backToHomeButton)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(voteStatusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(movieInfoPanelLayout.createSequentialGroup()
+                                .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(movieNameLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(movieName, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
+                                    .addComponent(movieGenresLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap())))
         );
         movieInfoPanelLayout.setVerticalGroup(
             movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -494,11 +508,13 @@ public class LobbyPanel extends javax.swing.JPanel {
                 .addGroup(movieInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(movieGenresLabel))
-                .addGap(91, 91, 91)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(suggestButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(voteButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 282, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 275, Short.MAX_VALUE)
                 .addComponent(voteStatusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(backToHomeButton)
@@ -646,12 +662,14 @@ public class LobbyPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton backToHomeButton;
+    private javax.swing.JTextArea descriptionTextArea;
     private javax.swing.Box.Filler filler1;
     private javax.swing.Box.Filler filler2;
     private javax.swing.JTextField genreField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel movieGenresLabel;
     private javax.swing.JPanel movieInfoPanel;
     private javax.swing.JLabel movieName;
